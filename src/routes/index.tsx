@@ -40,11 +40,16 @@ const FORMATIONS = [
   { id: "all", name: "ALL-IN", desc: "Every major league. Max chaos, max points (×2.5 XP)." },
 ];
 const CHIPS = [
-  { id: "ss", code: "SS", icon: "🎯", name: "Star Striker", pts: 30, desc: "3× points on your top pick this GW" },
-  { id: "tr", code: "TR", icon: "♻️", name: "Tactical Reset", pts: 15, desc: "Reshuffle all picks for free" },
-  { id: "fs", code: "FS", icon: "🛡️", name: "Full Squad", pts: 20, desc: "Every bench prediction scores" },
-  { id: "og", code: "OG", icon: "⚡", name: "One-Off Gambit", pts: 25, desc: "Single GW power play" },
-  { id: "ds", code: "DS", icon: "💎", name: "Double Stakes", pts: 40, desc: "Double points on next fixture" },
+  { id: "ss", code: "SS", icon: "🎯", name: "Star Striker", pts: 30, color: "#ffd700",
+    fx: "3× points on your top pick", desc: "Triples the score awarded by your highest-rated prediction this gameweek.", how: "Tap PLAY before kick-off — applies to your single best pick of the GW." },
+  { id: "tr", code: "TR", icon: "♻️", name: "Tactical Reset", pts: 15, color: "#00d4ff",
+    fx: "Reshuffle picks free", desc: "Unlock and rewrite all locked predictions in this gameweek without earning yellow cards.", how: "Activate, then edit your locked predictions until kick-off." },
+  { id: "fs", code: "FS", icon: "🛡️", name: "Full Squad", pts: 20, color: "#c8f400",
+    fx: "Every bench prediction scores", desc: "Bench picks normally score half — Full Squad makes them score 100% for one GW.", how: "Activate before deadline; bench scoring runs at full weight." },
+  { id: "og", code: "OG", icon: "⚡", name: "One-Off Gambit", pts: 25, color: "#9b59b6",
+    fx: "Single GW power play", desc: "Doubles points on a single match of your choice during this gameweek.", how: "Pick your match in the predictions panel after activating." },
+  { id: "ds", code: "DS", icon: "💎", name: "Double Stakes", pts: 40, color: "#e63946",
+    fx: "Double next fixture points", desc: "Doubles the total points returned by your next selected live fixture, win or lose.", how: "Activate, then pick the live match you want doubled from the right panel." },
 ];
 
 const BARCA_PLAYERS = [
