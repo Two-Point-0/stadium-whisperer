@@ -40,11 +40,16 @@ const FORMATIONS = [
   { id: "all", name: "ALL-IN", desc: "Every major league. Max chaos, max points (×2.5 XP)." },
 ];
 const CHIPS = [
-  { id: "ss", code: "SS", icon: "🎯", name: "Star Striker", pts: 30, desc: "3× points on your top pick this GW" },
-  { id: "tr", code: "TR", icon: "♻️", name: "Tactical Reset", pts: 15, desc: "Reshuffle all picks for free" },
-  { id: "fs", code: "FS", icon: "🛡️", name: "Full Squad", pts: 20, desc: "Every bench prediction scores" },
-  { id: "og", code: "OG", icon: "⚡", name: "One-Off Gambit", pts: 25, desc: "Single GW power play" },
-  { id: "ds", code: "DS", icon: "💎", name: "Double Stakes", pts: 40, desc: "Double points on next fixture" },
+  { id: "ss", code: "SS", icon: "🎯", name: "Star Striker", pts: 30, color: "#ffd700",
+    fx: "3× points on your top pick", desc: "Triples the score awarded by your highest-rated prediction this gameweek.", how: "Tap PLAY before kick-off — applies to your single best pick of the GW." },
+  { id: "tr", code: "TR", icon: "♻️", name: "Tactical Reset", pts: 15, color: "#00d4ff",
+    fx: "Reshuffle picks free", desc: "Unlock and rewrite all locked predictions in this gameweek without earning yellow cards.", how: "Activate, then edit your locked predictions until kick-off." },
+  { id: "fs", code: "FS", icon: "🛡️", name: "Full Squad", pts: 20, color: "#c8f400",
+    fx: "Every bench prediction scores", desc: "Bench picks normally score half — Full Squad makes them score 100% for one GW.", how: "Activate before deadline; bench scoring runs at full weight." },
+  { id: "og", code: "OG", icon: "⚡", name: "One-Off Gambit", pts: 25, color: "#9b59b6",
+    fx: "Single GW power play", desc: "Doubles points on a single match of your choice during this gameweek.", how: "Pick your match in the predictions panel after activating." },
+  { id: "ds", code: "DS", icon: "💎", name: "Double Stakes", pts: 40, color: "#e63946",
+    fx: "Double next fixture points", desc: "Doubles the total points returned by your next selected live fixture, win or lose.", how: "Activate, then pick the live match you want doubled from the right panel." },
 ];
 
 const BARCA_PLAYERS = [
@@ -222,6 +227,7 @@ function Index() {
   const [chipsUsed, setChipsUsed] = useState<Record<string, boolean>>({});
   const [chipFlash, setChipFlash] = useState<string | null>(null);
   const [activeChip, setActiveChip] = useState<typeof CHIPS[number] | null>(null);
+  const [chipTip, setChipTip] = useState<{ chip: typeof CHIPS[number]; x: number; y: number } | null>(null);
   const [toast, setToast] = useState<string>("");
 
   const [selectedMatch, setSelectedMatch] = useState(LIVE_MATCHES[0]);
@@ -456,19 +462,53 @@ function Index() {
             {/* Sub chips column — OUTSIDE the pitch */}
             <div className="chip-rail left">
               <div className="chip-rail-title">CHIPS</div>
-              {CHIPS.map((c) => (
-                <button
-                  key={c.id}
-                  className={"chip-btn " + (chipsUsed[c.id] ? "used " : "") + (chipFlash === c.id ? "flash" : "")}
-                  onClick={() => useChip(c.id)}
-                  title={`${c.name} — ${c.desc}`}
-                >
-                  <span className="chip-icon">{c.icon}</span>
-                  <span className="chip-code">{c.code}</span>
-                  <span className="chip-pts">+{c.pts}</span>
-                </button>
-              ))}
+              {CHIPS.map((c) => {
+                const used = !!chipsUsed[c.id];
+                return (
+                  <button
+                    key={c.id}
+                    className={"chip-btn " + (used ? "used " : "") + (chipFlash === c.id ? "flash" : "")}
+                    style={{
+                      borderColor: used ? "rgba(255,255,255,.08)" : `${c.color}55`,
+                      background: used
+                        ? "linear-gradient(160deg,rgba(0,0,0,.55),rgba(10,20,30,.7))"
+                        : `linear-gradient(160deg,${c.color}1f,rgba(0,0,0,.6))`,
+                    }}
+                    onClick={() => useChip(c.id)}
+                    onMouseEnter={(e) => {
+                      const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                      setChipTip({ chip: c, x: r.right + 8, y: r.top });
+                    }}
+                    onMouseLeave={() => setChipTip(null)}
+                  >
+                    <span className="chip-icon">{c.icon}</span>
+                    <span className="chip-code" style={{ color: c.color }}>{c.code}</span>
+                    <span className="chip-pts">+{c.pts}</span>
+                    {used && <span className="chip-st">USED</span>}
+                  </button>
+                );
+              })}
             </div>
+
+            {/* Chip hover tooltip */}
+            {chipTip && (
+              <div
+                className="chip-tip"
+                style={{
+                  left: chipTip.x,
+                  top: chipTip.y,
+                  borderColor: `${chipTip.chip.color}88`,
+                  boxShadow: `0 8px 28px ${chipTip.chip.color}33`,
+                }}
+              >
+                <div className="ct-name" style={{ color: chipTip.chip.color }}>
+                  {chipTip.chip.icon} {chipTip.chip.name}
+                </div>
+                <div className="ct-fx" style={{ color: chipTip.chip.color }}>{chipTip.chip.fx} · +{chipTip.chip.pts} pts</div>
+                <div className="ct-desc">{chipTip.chip.desc}</div>
+                <div className="ct-how">▸ {chipTip.chip.how}</div>
+              </div>
+            )}
 
             {/* COURT */}
             <div className="court-area">
