@@ -605,6 +605,32 @@ function Index() {
             ))}
           </div>
         </aside>
+
+        {/* ROOF CURTAIN — body-level, covers everything edge-to-edge */}
+        <div className={"roof body-roof " + roofAnim}>
+          <div className="roof-half left">
+            <div className="roof-strip">
+              <span className="rs-tag">⚙</span>
+              <span className="rs-title">PREDICT CENTER</span>
+              <span className="rs-sub">GW · Discipline · Match Predictions</span>
+            </div>
+            <div className="roof-mid">
+              <div className="roof-mid-line">— STADIUM ROOF CLOSED —</div>
+              <div className="roof-mid-hint">Tap OPEN ROOF below to access your dashboard</div>
+            </div>
+          </div>
+          <div className="roof-half right">
+            <div className="roof-strip">
+              <span className="rs-tag">📈</span>
+              <span className="rs-title">SEASON OUTLOOK</span>
+              <span className="rs-sub">My Season · Picks · Standings</span>
+            </div>
+            <div className="roof-mid">
+              <div className="roof-mid-line">— GAFFER'S PICK —</div>
+              <div className="roof-mid-hint">Stadium Predictor · Season 25/26</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* NAV */}
