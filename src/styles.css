@@ -58,7 +58,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .sv{width:clamp(2px,.36vw,3.5px);height:clamp(1.5px,.26vw,3px);border-radius:.5px;background:var(--seat);flex-shrink:0}
 .sv.on{background:var(--seat-on)}
 
-.bb{flex-shrink:0;background:#000;overflow:hidden;height:clamp(13px,1.7vw,20px)}
+.bb{flex-shrink:0;background:#000;overflow:hidden;height:clamp(26px,3.6vw,42px);border-top:1px solid rgba(200,244,0,.18);border-bottom:1px solid rgba(200,244,0,.18)}
 .bb-inner{display:flex;height:100%;width:200%}
 .bb-inner.go{animation:adH 15s linear infinite}
 .bb-inner.rv{animation:adHR 18s linear infinite}
