@@ -361,31 +361,18 @@ function Index() {
               Set GW, formation, and score picks. Tap any match card to simulate it on the pitch.
             </div>
 
-            {/* GW scroll */}
-            <div className="card">
-              <div style={{ fontFamily: "var(--cd)", fontSize: ".44rem", color: "rgba(200,244,0,.5)", letterSpacing: "1.5px", marginBottom: 4 }}>GAME WEEK</div>
-              <div className="gw-nav">
-                <button className="gw-nav-btn" onClick={() => setGw(g => Math.max(1, g - 1))}>‹</button>
-                <div className="gw-display">
-                  <div className="gw-num">GW {gw}</div>
-                  <div className="gw-pts-big">+{32 + (gw % 5) * 6}</div>
-                  <div className="gw-meta">5 / 10 correct</div>
-                </div>
-                <button className="gw-nav-btn" onClick={() => setGw(g => Math.min(38, g + 1))}>›</button>
-              </div>
-            </div>
-
-            {/* Formation scroll */}
-            <div className="card">
-              <div style={{ fontFamily: "var(--cd)", fontSize: ".44rem", color: "rgba(200,244,0,.5)", letterSpacing: "1.5px", marginBottom: 4 }}>FORMATION MODE</div>
-              <div className="gw-nav">
-                <button className="gw-nav-btn" onClick={() => setFormIdx(i => (i - 1 + FORMATIONS.length) % FORMATIONS.length)}>‹</button>
-                <div className="form-display">
-                  <div className="form-name">{formation.name}</div>
-                  <div className="form-desc">{formation.desc}</div>
-                </div>
-                <button className="gw-nav-btn" onClick={() => setFormIdx(i => (i + 1) % FORMATIONS.length)}>›</button>
-              </div>
+            {/* Compact GW + Formation row — tap to edit */}
+            <div className="mini-row">
+              <button className="mini-chip" onClick={() => setEditor({ type: "gw" })}>
+                <span className="mini-lbl">GW</span>
+                <span className="mini-val">{gw}</span>
+                <span className="mini-sub">+{32 + (gw % 5) * 6} pts</span>
+              </button>
+              <button className="mini-chip" onClick={() => setEditor({ type: "form" })}>
+                <span className="mini-lbl">FORM</span>
+                <span className="mini-val">{formation.name}</span>
+                <span className="mini-sub">tap to change</span>
+              </button>
             </div>
 
             {/* Cards tracker */}
