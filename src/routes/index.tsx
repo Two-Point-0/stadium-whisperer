@@ -450,10 +450,6 @@ function Index() {
 
         {/* PITCH WRAP */}
         <main className="pitch-wrap">
-          {/* top stand */}
-          <div className="stand" style={{ width: "100%", height: 28, flexDirection: "column" }}>
-            <Seats rows={3} cols={120} />
-          </div>
           <Billboard />
 
           <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative" }}>
