@@ -685,9 +685,6 @@ function Index() {
           </div>
 
           <Billboard reverse />
-          <div className="stand" style={{ width: "100%", height: 28 }}>
-            <Seats rows={3} cols={120} />
-          </div>
         </main>
 
         {/* RIGHT PANEL — Container 2 */}
