@@ -280,11 +280,16 @@ function Index() {
 
   const useChip = (id: string) => {
     if (chipsUsed[id]) return;
+    const chip = CHIPS.find(c => c.id === id)!;
     setChipsUsed({ ...chipsUsed, [id]: true });
-    showToast(`${CHIPS.find(c => c.id === id)?.name} activated`);
-    setPoints(p => p + 25);
-    setPtsFloat({ id: Date.now(), v: 25 });
+    setChipFlash(id);
+    setActiveChip(chip);
+    showToast(`${chip.icon} ${chip.name} activated · +${chip.pts} pts`);
+    setPoints(p => p + chip.pts);
+    setPtsFloat({ id: Date.now(), v: chip.pts });
     setTimeout(() => setPtsFloat(null), 1100);
+    setTimeout(() => setChipFlash(null), 900);
+    setTimeout(() => setActiveChip(null), 2600);
   };
 
   const togglePredLock = (mid: string) => {
