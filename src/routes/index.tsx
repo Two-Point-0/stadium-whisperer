@@ -40,11 +40,11 @@ const FORMATIONS = [
   { id: "all", name: "ALL-IN", desc: "Every major league. Max chaos, max points (×2.5 XP)." },
 ];
 const CHIPS = [
-  { id: "tc", code: "TC", icon: "👑", name: "Triple Captain" },
-  { id: "wc", code: "WC", icon: "🃏", name: "Wildcard" },
-  { id: "bb", code: "BB", icon: "🪑", name: "Bench Boost" },
-  { id: "fh", code: "FH", icon: "🔄", name: "Free Hit" },
-  { id: "x2", code: "2X", icon: "✖️", name: "Double Down" },
+  { id: "ss", code: "SS", icon: "🎯", name: "Star Striker", pts: 30, desc: "3× points on your top pick this GW" },
+  { id: "tr", code: "TR", icon: "♻️", name: "Tactical Reset", pts: 15, desc: "Reshuffle all picks for free" },
+  { id: "fs", code: "FS", icon: "🛡️", name: "Full Squad", pts: 20, desc: "Every bench prediction scores" },
+  { id: "og", code: "OG", icon: "⚡", name: "One-Off Gambit", pts: 25, desc: "Single GW power play" },
+  { id: "ds", code: "DS", icon: "💎", name: "Double Stakes", pts: 40, desc: "Double points on next fixture" },
 ];
 
 const BARCA_PLAYERS = [
@@ -156,18 +156,46 @@ function Billboard({ reverse }: { reverse?: boolean }) {
 
 function CourtMarkings() {
   return (
-    <svg className="court-svg" viewBox="0 0 100 60" preserveAspectRatio="none">
-      <g stroke="rgba(255,255,255,.55)" strokeWidth=".22" fill="none">
-        <rect x="2" y="2" width="96" height="56" />
-        <line x1="50" y1="2" x2="50" y2="58" />
-        <circle cx="50" cy="30" r="7" />
-        <circle cx="50" cy="30" r=".5" fill="rgba(255,255,255,.55)" />
-        <rect x="2" y="14" width="14" height="32" />
-        <rect x="84" y="14" width="14" height="32" />
-        <rect x="2" y="22" width="6" height="16" />
-        <rect x="92" y="22" width="6" height="16" />
-        <path d="M 16 24 A 8 8 0 0 1 16 36" />
-        <path d="M 84 24 A 8 8 0 0 0 84 36" />
+    <svg className="court-svg" viewBox="0 0 60 100" preserveAspectRatio="none">
+      <g stroke="rgba(255,255,255,.6)" strokeWidth=".25" fill="none">
+        {/* outer */}
+        <rect x="2" y="2" width="56" height="96" />
+        {/* halfway */}
+        <line x1="2" y1="50" x2="58" y2="50" />
+        <circle cx="30" cy="50" r="8" />
+        <circle cx="30" cy="50" r=".6" fill="rgba(255,255,255,.6)" />
+        {/* top penalty box */}
+        <rect x="12" y="2" width="36" height="14" />
+        <rect x="22" y="2" width="16" height="5" />
+        <circle cx="30" cy="11" r=".5" fill="rgba(255,255,255,.6)" />
+        <path d="M 22 16 A 8 8 0 0 0 38 16" />
+        {/* bottom penalty box */}
+        <rect x="12" y="84" width="36" height="14" />
+        <rect x="22" y="93" width="16" height="5" />
+        <circle cx="30" cy="89" r=".5" fill="rgba(255,255,255,.6)" />
+        <path d="M 22 84 A 8 8 0 0 1 38 84" />
+        {/* corner arcs */}
+        <path d="M 2 4 A 2 2 0 0 0 4 2" />
+        <path d="M 58 4 A 2 2 0 0 1 56 2" />
+        <path d="M 2 96 A 2 2 0 0 1 4 98" />
+        <path d="M 58 96 A 2 2 0 0 0 56 98" />
+      </g>
+      {/* GOALPOSTS top */}
+      <g stroke="#fff" strokeWidth=".5" fill="none" strokeLinecap="square">
+        <line x1="26" y1="2" x2="26" y2="0" />
+        <line x1="34" y1="2" x2="34" y2="0" />
+        <line x1="26" y1="0" x2="34" y2="0" />
+        {/* net hatch */}
+        <line x1="26" y1="0" x2="34" y2="2" stroke="rgba(255,255,255,.35)" strokeWidth=".18" />
+        <line x1="34" y1="0" x2="26" y2="2" stroke="rgba(255,255,255,.35)" strokeWidth=".18" />
+      </g>
+      {/* GOALPOSTS bottom */}
+      <g stroke="#fff" strokeWidth=".5" fill="none" strokeLinecap="square">
+        <line x1="26" y1="98" x2="26" y2="100" />
+        <line x1="34" y1="98" x2="34" y2="100" />
+        <line x1="26" y1="100" x2="34" y2="100" />
+        <line x1="26" y1="100" x2="34" y2="98" stroke="rgba(255,255,255,.35)" strokeWidth=".18" />
+        <line x1="34" y1="100" x2="26" y2="98" stroke="rgba(255,255,255,.35)" strokeWidth=".18" />
       </g>
     </svg>
   );
@@ -192,6 +220,8 @@ function Index() {
   const [reds, setReds] = useState(0);
 
   const [chipsUsed, setChipsUsed] = useState<Record<string, boolean>>({});
+  const [chipFlash, setChipFlash] = useState<string | null>(null);
+  const [activeChip, setActiveChip] = useState<typeof CHIPS[number] | null>(null);
   const [toast, setToast] = useState<string>("");
 
   const [selectedMatch, setSelectedMatch] = useState(LIVE_MATCHES[0]);
@@ -250,11 +280,16 @@ function Index() {
 
   const useChip = (id: string) => {
     if (chipsUsed[id]) return;
+    const chip = CHIPS.find(c => c.id === id)!;
     setChipsUsed({ ...chipsUsed, [id]: true });
-    showToast(`${CHIPS.find(c => c.id === id)?.name} activated`);
-    setPoints(p => p + 25);
-    setPtsFloat({ id: Date.now(), v: 25 });
+    setChipFlash(id);
+    setActiveChip(chip);
+    showToast(`${chip.icon} ${chip.name} activated · +${chip.pts} pts`);
+    setPoints(p => p + chip.pts);
+    setPtsFloat({ id: Date.now(), v: chip.pts });
     setTimeout(() => setPtsFloat(null), 1100);
+    setTimeout(() => setChipFlash(null), 900);
+    setTimeout(() => setActiveChip(null), 2600);
   };
 
   const togglePredLock = (mid: string) => {
@@ -418,20 +453,38 @@ function Index() {
               <Seats rows={36} cols={6} />
             </div>
 
+            {/* Sub chips column — OUTSIDE the pitch */}
+            <div className="chip-rail left">
+              <div className="chip-rail-title">CHIPS</div>
+              {CHIPS.map((c) => (
+                <button
+                  key={c.id}
+                  className={"chip-btn " + (chipsUsed[c.id] ? "used " : "") + (chipFlash === c.id ? "flash" : "")}
+                  onClick={() => useChip(c.id)}
+                  title={`${c.name} — ${c.desc}`}
+                >
+                  <span className="chip-icon">{c.icon}</span>
+                  <span className="chip-code">{c.code}</span>
+                  <span className="chip-pts">+{c.pts}</span>
+                </button>
+              ))}
+            </div>
+
             {/* COURT */}
             <div className="court-area">
               <div className="court-bg" />
               <CourtMarkings />
 
-              {/* Sub chips column */}
-              <div className="chip-col">
-                {CHIPS.map((c) => (
-                  <button key={c.id} className={"chip-btn " + (chipsUsed[c.id] ? "used" : "")} onClick={() => useChip(c.id)} title={c.name}>
-                    <span className="chip-icon">{c.icon}</span>
-                    <span className="chip-code">{c.code}</span>
-                  </button>
-                ))}
-              </div>
+              {/* Active chip badge overlay (simulation) */}
+              {activeChip && (
+                <div className="chip-active-badge">
+                  <span className="cab-icon">{activeChip.icon}</span>
+                  <div>
+                    <div className="cab-name">{activeChip.name}</div>
+                    <div className="cab-pts">+{activeChip.pts} PTS APPLIED</div>
+                  </div>
+                </div>
+              )}
 
               {/* Match HUD */}
               {!roofOpen && (
@@ -583,12 +636,8 @@ function Index() {
                 </div>
               </div>
 
-              {/* Open/Close roof button */}
-              <button className={"roof-btn " + (roofOpen ? "open-state" : "")} onClick={toggleRoof}>
-                <span className="roof-icon">▼</span>
-                {roofOpen ? "CLOSE ROOF" : "OPEN ROOF"}
-              </button>
             </div>
+
 
             {/* right stand */}
             <div className="stand right">
@@ -659,9 +708,13 @@ function Index() {
           <span className="nav-label">Sport</span>
           <span className="nav-sub">{sport.name}</span>
         </button>
-        <button className="open-btn" onClick={toggleRoof}>
-          <span className="ob-icon">{roofOpen ? "🏟️" : "🔒"}</span>
-          <span className="ob-lbl">{roofOpen ? "Close Roof" : "Open Roof"}</span>
+        <button className={"roof-toggle " + (roofOpen ? "is-open" : "")} onClick={toggleRoof} aria-label={roofOpen ? "Close roof" : "Open roof"}>
+          <span className="rt-arrows">
+            <span className="rt-arrow up">▲</span>
+            <span className="rt-arrow dn">▼</span>
+          </span>
+          <span className="rt-label">{roofOpen ? "Close Roof" : "Open Roof"}</span>
+          <span className="rt-sub">{roofOpen ? "Hide HQ + Standings" : "View HQ + Standings"}</span>
         </button>
         <button className="nav-btn" onClick={() => setPopup(popup === "league" ? null : "league")}>
           <span className="nav-icon">{league.icon}</span>
