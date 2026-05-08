@@ -413,7 +413,7 @@ function Index() {
             <div className="divr" />
 
             {/* Goal predictions */}
-            <div className="sec">⚽ Score Predictions · GW {gw}</div>
+            <div className="sec">⚽ Match Predictions · GW {gw}</div>
             {LIVE_MATCHES.map((m) => {
               const p = preds[m.id];
               return (
