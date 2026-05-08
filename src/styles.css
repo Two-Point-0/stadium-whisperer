@@ -312,3 +312,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .roof-toggle.is-open .rt-arrow.dn{opacity:1;transform:translateY(-2px) rotate(180deg)}
 .rt-label{font-family:var(--hd);font-size:.85rem;letter-spacing:2.6px;color:var(--lime);text-shadow:0 0 12px rgba(200,244,0,.4)}
 .rt-sub{font-family:var(--cd);font-size:.42rem;letter-spacing:1.5px;color:rgba(200,244,0,.55);text-transform:uppercase}
+
+/* === Chip hover tooltip === */
+.chip-tip{
+  position:fixed;background:rgba(2,5,13,.98);border-radius:9px;
+  padding:10px 14px;min-width:200px;max-width:240px;
+  z-index:5000;animation:fadeUp .12s ease;pointer-events:none;
+  border:1px solid rgba(200,244,0,.4);
+}
+.ct-name{font-family:var(--hd);font-size:.95rem;letter-spacing:1.5px;margin-bottom:3px}
+.ct-fx{font-family:var(--cd);font-size:.55rem;font-weight:800;margin-bottom:5px;letter-spacing:.5px}
+.ct-desc{font-family:var(--cd);font-size:.5rem;color:var(--sub);line-height:1.5;margin-bottom:5px}
+.ct-how{font-family:var(--cd);font-size:.46rem;color:rgba(255,215,0,.72);font-style:italic;border-top:1px solid rgba(255,255,255,.07);padding-top:5px}
+.chip-rail .chip-st{font-family:var(--cd);font-size:.36rem;letter-spacing:1px;color:var(--red);font-weight:800}
