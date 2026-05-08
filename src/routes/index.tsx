@@ -453,20 +453,38 @@ function Index() {
               <Seats rows={36} cols={6} />
             </div>
 
+            {/* Sub chips column — OUTSIDE the pitch */}
+            <div className="chip-rail left">
+              <div className="chip-rail-title">CHIPS</div>
+              {CHIPS.map((c) => (
+                <button
+                  key={c.id}
+                  className={"chip-btn " + (chipsUsed[c.id] ? "used " : "") + (chipFlash === c.id ? "flash" : "")}
+                  onClick={() => useChip(c.id)}
+                  title={`${c.name} — ${c.desc}`}
+                >
+                  <span className="chip-icon">{c.icon}</span>
+                  <span className="chip-code">{c.code}</span>
+                  <span className="chip-pts">+{c.pts}</span>
+                </button>
+              ))}
+            </div>
+
             {/* COURT */}
             <div className="court-area">
               <div className="court-bg" />
               <CourtMarkings />
 
-              {/* Sub chips column */}
-              <div className="chip-col">
-                {CHIPS.map((c) => (
-                  <button key={c.id} className={"chip-btn " + (chipsUsed[c.id] ? "used" : "")} onClick={() => useChip(c.id)} title={c.name}>
-                    <span className="chip-icon">{c.icon}</span>
-                    <span className="chip-code">{c.code}</span>
-                  </button>
-                ))}
-              </div>
+              {/* Active chip badge overlay (simulation) */}
+              {activeChip && (
+                <div className="chip-active-badge">
+                  <span className="cab-icon">{activeChip.icon}</span>
+                  <div>
+                    <div className="cab-name">{activeChip.name}</div>
+                    <div className="cab-pts">+{activeChip.pts} PTS APPLIED</div>
+                  </div>
+                </div>
+              )}
 
               {/* Match HUD */}
               {!roofOpen && (
