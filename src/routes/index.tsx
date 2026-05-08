@@ -606,28 +606,80 @@ function Index() {
           </div>
         </aside>
 
+        {/* ROOF RAILS — fixed tracks at the edges where the roof slides into */}
+        <div className="roof-rail left" />
+        <div className="roof-rail right" />
+
         {/* ROOF CURTAIN — body-level, covers everything edge-to-edge */}
         <div className={"roof body-roof " + roofAnim}>
           <div className="roof-half left">
-            <div className="roof-strip">
-              <span className="rs-tag">⚙</span>
-              <span className="rs-title">PREDICT CENTER</span>
-              <span className="rs-sub">GW · Discipline · Match Predictions</span>
+            {/* Team info header — always visible at top */}
+            <div className="roof-strip team-strip">
+              <div className="ts-avatar">G</div>
+              <div className="ts-info">
+                <div className="ts-name">GAFFER_92 <span className="ts-flag">🇪🇸</span></div>
+                <div className="ts-meta">FC Barcelona fan · Season 25/26</div>
+              </div>
+              <div className="ts-stat">
+                <span className="ts-v">{points}</span>
+                <span className="ts-l">PTS</span>
+              </div>
+              <div className="ts-stat gold">
+                <span className="ts-v">14k</span>
+                <span className="ts-l">RANK</span>
+              </div>
             </div>
             <div className="roof-mid">
-              <div className="roof-mid-line">— STADIUM ROOF CLOSED —</div>
-              <div className="roof-mid-hint">Tap OPEN ROOF below to access your dashboard</div>
+              <div className="rm-grid">
+                <div className="rm-card"><span className="rmc-v">71%</span><span className="rmc-l">Accuracy</span></div>
+                <div className="rm-card"><span className="rmc-v">62</span><span className="rmc-l">GW Best</span></div>
+                <div className="rm-card"><span className="rmc-v">{gw}</span><span className="rmc-l">GW</span></div>
+                <div className="rm-card"><span className="rmc-v">5/10</span><span className="rmc-l">Correct</span></div>
+              </div>
+              <div className="rm-pred-summary">
+                <div className="rmp-title">⚽ This GW · {Object.values(preds).filter(p=>p.locked).length}/{Object.keys(preds).length} predictions locked</div>
+                <div className="rmp-list">
+                  {LIVE_MATCHES.slice(0,3).map(m=>{
+                    const p = preds[m.id];
+                    return <div key={m.id} className="rmp-item">{m.h.slice(0,3).toUpperCase()} <span className="rmp-sc">{p.h}-{p.a}</span> {m.a.slice(0,3).toUpperCase()} {p.locked?"🔒":"🔓"}</div>;
+                  })}
+                </div>
+              </div>
+              <div className="roof-mid-hint">— Stadium Roof Closed · Tap OPEN ROOF to access full dashboard —</div>
             </div>
           </div>
           <div className="roof-half right">
-            <div className="roof-strip">
-              <span className="rs-tag">📈</span>
-              <span className="rs-title">SEASON OUTLOOK</span>
-              <span className="rs-sub">My Season · Picks · Standings</span>
+            <div className="roof-strip team-strip">
+              <div className="ts-trophy">🏆</div>
+              <div className="ts-info">
+                <div className="ts-name">LA LIGA · 2nd</div>
+                <div className="ts-meta">UCL group · 2nd · 13 pts</div>
+              </div>
+              <div className="ts-stat">
+                <span className="ts-v">33</span>
+                <span className="ts-l">L.LIGA</span>
+              </div>
+              <div className="ts-stat gold">
+                <span className="ts-v">13</span>
+                <span className="ts-l">UCL</span>
+              </div>
             </div>
             <div className="roof-mid">
-              <div className="roof-mid-line">— GAFFER'S PICK —</div>
-              <div className="roof-mid-hint">Stadium Predictor · Season 25/26</div>
+              <div className="rm-grid">
+                <div className="rm-card"><span className="rmc-v">10W</span><span className="rmc-l">Wins</span></div>
+                <div className="rm-card"><span className="rmc-v">3D</span><span className="rmc-l">Draws</span></div>
+                <div className="rm-card"><span className="rmc-v">1L</span><span className="rmc-l">Losses</span></div>
+                <div className="rm-card"><span className="rmc-v">+18</span><span className="rmc-l">GD</span></div>
+              </div>
+              <div className="rm-pred-summary">
+                <div className="rmp-title">🥇 Season Picks</div>
+                <div className="rmp-list">
+                  <div className="rmp-item">⚽ Top Scorer · <span className="rmp-sc">{seasonPicks.topScorer}</span> {picksLocked.topScorer?"🔒":"🔓"}</div>
+                  <div className="rmp-item">🅰 Top Assist · <span className="rmp-sc">{seasonPicks.topAssist}</span> {picksLocked.topAssist?"🔒":"🔓"}</div>
+                  <div className="rmp-item">🏆 Ballon d'Or · <span className="rmp-sc">{seasonPicks.ballonDor}</span> {picksLocked.ballonDor?"🔒":"🔓"}</div>
+                </div>
+              </div>
+              <div className="roof-mid-hint">— Standings · Mini-Leagues · Player Ratings hidden —</div>
             </div>
           </div>
         </div>
