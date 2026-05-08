@@ -372,3 +372,43 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .ed-stepper button:hover:not(:disabled){background:rgba(200,244,0,.18)}
 .ed-stepper button:disabled{opacity:.3;cursor:not-allowed}
 .ed-stepper span{font-family:var(--hd);font-size:1.4rem;color:var(--lime);min-width:28px;text-align:center}
+
+/* === Roof rails (visible tracks at left/right edges) === */
+.roof-rail{position:absolute;top:0;bottom:0;width:14px;z-index:560;pointer-events:none;
+  background:
+    linear-gradient(180deg,#0a0f15 0%,#1a2433 50%,#0a0f15 100%);
+  border-right:1px solid rgba(200,244,0,.25);border-left:1px solid rgba(0,0,0,.6);
+  box-shadow:inset -2px 0 4px rgba(0,0,0,.7),inset 2px 0 4px rgba(200,244,0,.08);
+}
+.roof-rail.left{left:0}
+.roof-rail.right{right:0;border-left:1px solid rgba(200,244,0,.25);border-right:1px solid rgba(0,0,0,.6);box-shadow:inset 2px 0 4px rgba(0,0,0,.7),inset -2px 0 4px rgba(200,244,0,.08)}
+.roof-rail::before,.roof-rail::after{content:"";position:absolute;left:2px;right:2px;height:8px;background:repeating-linear-gradient(90deg,rgba(200,244,0,.5) 0 3px,transparent 3px 6px);border-radius:2px}
+.roof-rail::before{top:8px}
+.roof-rail::after{bottom:8px}
+
+/* Adjust body-roof to account for rails */
+.body-roof{left:14px !important;right:14px !important;inset:0 14px !important}
+
+/* Team strip on top of roof half */
+.roof-strip.team-strip{display:flex;align-items:center;gap:10px;padding:8px 14px;min-height:54px;background:linear-gradient(180deg,rgba(200,244,0,.18),rgba(200,244,0,.04) 70%,transparent);border-bottom:1px solid rgba(200,244,0,.32);box-shadow:0 4px 14px rgba(0,0,0,.4)}
+.ts-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#c8f400,#7fc000);display:flex;align-items:center;justify-content:center;font-family:var(--hd);font-size:1.2rem;color:#04140a;flex-shrink:0;box-shadow:0 0 0 2px rgba(200,244,0,.5)}
+.ts-trophy{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#ffd700,#a87c00);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;box-shadow:0 0 0 2px rgba(255,215,0,.5)}
+.ts-info{flex:1;min-width:0;overflow:hidden}
+.ts-name{font-family:var(--hd);font-size:.9rem;letter-spacing:1.6px;color:var(--lime);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ts-flag{font-size:.7rem}
+.ts-meta{font-family:var(--cd);font-size:.46rem;color:var(--sub);letter-spacing:.8px;text-transform:uppercase}
+.ts-stat{display:flex;flex-direction:column;align-items:center;padding:3px 8px;border-left:1px solid rgba(200,244,0,.18);min-width:42px}
+.ts-v{font-family:var(--hd);font-size:.95rem;color:var(--lime);line-height:1}
+.ts-stat.gold .ts-v{color:var(--gold)}
+.ts-l{font-family:var(--cd);font-size:.36rem;color:var(--sub);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+
+/* Roof body content */
+.rm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%;max-width:340px}
+.rm-card{background:rgba(0,0,0,.5);border:1px solid rgba(200,244,0,.18);border-radius:8px;padding:8px 4px;text-align:center;display:flex;flex-direction:column;gap:2px}
+.rmc-v{font-family:var(--hd);font-size:1.1rem;color:var(--lime);line-height:1}
+.rmc-l{font-family:var(--cd);font-size:.4rem;color:var(--sub);letter-spacing:1px;text-transform:uppercase}
+.rm-pred-summary{width:100%;max-width:340px;background:rgba(0,0,0,.45);border:1px solid rgba(200,244,0,.14);border-radius:8px;padding:8px 10px}
+.rmp-title{font-family:var(--cd);font-size:.5rem;color:var(--lime);letter-spacing:1.5px;font-weight:800;margin-bottom:6px;text-transform:uppercase}
+.rmp-list{display:flex;flex-direction:column;gap:4px}
+.rmp-item{font-family:var(--cd);font-size:.52rem;color:var(--text);display:flex;align-items:center;gap:6px;padding:3px 6px;background:rgba(255,255,255,.03);border-radius:5px}
+.rmp-sc{font-family:var(--hd);color:var(--gold);letter-spacing:1px;flex:1;text-align:center}
