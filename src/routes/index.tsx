@@ -227,6 +227,7 @@ function Index() {
   const [chipsUsed, setChipsUsed] = useState<Record<string, boolean>>({});
   const [chipFlash, setChipFlash] = useState<string | null>(null);
   const [activeChip, setActiveChip] = useState<typeof CHIPS[number] | null>(null);
+  const [chipTip, setChipTip] = useState<{ chip: typeof CHIPS[number]; x: number; y: number } | null>(null);
   const [toast, setToast] = useState<string>("");
 
   const [selectedMatch, setSelectedMatch] = useState(LIVE_MATCHES[0]);
