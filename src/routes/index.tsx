@@ -462,19 +462,53 @@ function Index() {
             {/* Sub chips column — OUTSIDE the pitch */}
             <div className="chip-rail left">
               <div className="chip-rail-title">CHIPS</div>
-              {CHIPS.map((c) => (
-                <button
-                  key={c.id}
-                  className={"chip-btn " + (chipsUsed[c.id] ? "used " : "") + (chipFlash === c.id ? "flash" : "")}
-                  onClick={() => useChip(c.id)}
-                  title={`${c.name} — ${c.desc}`}
-                >
-                  <span className="chip-icon">{c.icon}</span>
-                  <span className="chip-code">{c.code}</span>
-                  <span className="chip-pts">+{c.pts}</span>
-                </button>
-              ))}
+              {CHIPS.map((c) => {
+                const used = !!chipsUsed[c.id];
+                return (
+                  <button
+                    key={c.id}
+                    className={"chip-btn " + (used ? "used " : "") + (chipFlash === c.id ? "flash" : "")}
+                    style={{
+                      borderColor: used ? "rgba(255,255,255,.08)" : `${c.color}55`,
+                      background: used
+                        ? "linear-gradient(160deg,rgba(0,0,0,.55),rgba(10,20,30,.7))"
+                        : `linear-gradient(160deg,${c.color}1f,rgba(0,0,0,.6))`,
+                    }}
+                    onClick={() => useChip(c.id)}
+                    onMouseEnter={(e) => {
+                      const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                      setChipTip({ chip: c, x: r.right + 8, y: r.top });
+                    }}
+                    onMouseLeave={() => setChipTip(null)}
+                  >
+                    <span className="chip-icon">{c.icon}</span>
+                    <span className="chip-code" style={{ color: c.color }}>{c.code}</span>
+                    <span className="chip-pts">+{c.pts}</span>
+                    {used && <span className="chip-st">USED</span>}
+                  </button>
+                );
+              })}
             </div>
+
+            {/* Chip hover tooltip */}
+            {chipTip && (
+              <div
+                className="chip-tip"
+                style={{
+                  left: chipTip.x,
+                  top: chipTip.y,
+                  borderColor: `${chipTip.chip.color}88`,
+                  boxShadow: `0 8px 28px ${chipTip.chip.color}33`,
+                }}
+              >
+                <div className="ct-name" style={{ color: chipTip.chip.color }}>
+                  {chipTip.chip.icon} {chipTip.chip.name}
+                </div>
+                <div className="ct-fx" style={{ color: chipTip.chip.color }}>{chipTip.chip.fx} · +{chipTip.chip.pts} pts</div>
+                <div className="ct-desc">{chipTip.chip.desc}</div>
+                <div className="ct-how">▸ {chipTip.chip.how}</div>
+              </div>
+            )}
 
             {/* COURT */}
             <div className="court-area">
