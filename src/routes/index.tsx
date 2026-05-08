@@ -636,12 +636,8 @@ function Index() {
                 </div>
               </div>
 
-              {/* Open/Close roof button */}
-              <button className={"roof-btn " + (roofOpen ? "open-state" : "")} onClick={toggleRoof}>
-                <span className="roof-icon">▼</span>
-                {roofOpen ? "CLOSE ROOF" : "OPEN ROOF"}
-              </button>
             </div>
+
 
             {/* right stand */}
             <div className="stand right">
