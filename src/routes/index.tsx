@@ -405,7 +405,7 @@ function Index() {
             {LIVE_MATCHES.map((m) => {
               const p = preds[m.id];
               return (
-                <div className={"pred-card " + (selectedMatch.id === m.id ? "act" : "")} key={m.id} onClick={() => setSelectedMatch(m)}>
+                <div className={"pred-card " + (selectedMatch.id === m.id ? "act" : "")} key={m.id} onClick={() => { setSelectedMatch(m); setEditor({ type: "pred", id: m.id }); }}>
                   <div className="pc-head">
                     {m.live ? (
                       <span className="live-pill"><span className="live-dot" />LIVE {m.min}</span>
