@@ -156,18 +156,46 @@ function Billboard({ reverse }: { reverse?: boolean }) {
 
 function CourtMarkings() {
   return (
-    <svg className="court-svg" viewBox="0 0 100 60" preserveAspectRatio="none">
-      <g stroke="rgba(255,255,255,.55)" strokeWidth=".22" fill="none">
-        <rect x="2" y="2" width="96" height="56" />
-        <line x1="50" y1="2" x2="50" y2="58" />
-        <circle cx="50" cy="30" r="7" />
-        <circle cx="50" cy="30" r=".5" fill="rgba(255,255,255,.55)" />
-        <rect x="2" y="14" width="14" height="32" />
-        <rect x="84" y="14" width="14" height="32" />
-        <rect x="2" y="22" width="6" height="16" />
-        <rect x="92" y="22" width="6" height="16" />
-        <path d="M 16 24 A 8 8 0 0 1 16 36" />
-        <path d="M 84 24 A 8 8 0 0 0 84 36" />
+    <svg className="court-svg" viewBox="0 0 60 100" preserveAspectRatio="none">
+      <g stroke="rgba(255,255,255,.6)" strokeWidth=".25" fill="none">
+        {/* outer */}
+        <rect x="2" y="2" width="56" height="96" />
+        {/* halfway */}
+        <line x1="2" y1="50" x2="58" y2="50" />
+        <circle cx="30" cy="50" r="8" />
+        <circle cx="30" cy="50" r=".6" fill="rgba(255,255,255,.6)" />
+        {/* top penalty box */}
+        <rect x="12" y="2" width="36" height="14" />
+        <rect x="22" y="2" width="16" height="5" />
+        <circle cx="30" cy="11" r=".5" fill="rgba(255,255,255,.6)" />
+        <path d="M 22 16 A 8 8 0 0 0 38 16" />
+        {/* bottom penalty box */}
+        <rect x="12" y="84" width="36" height="14" />
+        <rect x="22" y="93" width="16" height="5" />
+        <circle cx="30" cy="89" r=".5" fill="rgba(255,255,255,.6)" />
+        <path d="M 22 84 A 8 8 0 0 1 38 84" />
+        {/* corner arcs */}
+        <path d="M 2 4 A 2 2 0 0 0 4 2" />
+        <path d="M 58 4 A 2 2 0 0 1 56 2" />
+        <path d="M 2 96 A 2 2 0 0 1 4 98" />
+        <path d="M 58 96 A 2 2 0 0 0 56 98" />
+      </g>
+      {/* GOALPOSTS top */}
+      <g stroke="#fff" strokeWidth=".5" fill="none" strokeLinecap="square">
+        <line x1="26" y1="2" x2="26" y2="0" />
+        <line x1="34" y1="2" x2="34" y2="0" />
+        <line x1="26" y1="0" x2="34" y2="0" />
+        {/* net hatch */}
+        <line x1="26" y1="0" x2="34" y2="2" stroke="rgba(255,255,255,.35)" strokeWidth=".18" />
+        <line x1="34" y1="0" x2="26" y2="2" stroke="rgba(255,255,255,.35)" strokeWidth=".18" />
+      </g>
+      {/* GOALPOSTS bottom */}
+      <g stroke="#fff" strokeWidth=".5" fill="none" strokeLinecap="square">
+        <line x1="26" y1="98" x2="26" y2="100" />
+        <line x1="34" y1="98" x2="34" y2="100" />
+        <line x1="26" y1="100" x2="34" y2="100" />
+        <line x1="26" y1="100" x2="34" y2="98" stroke="rgba(255,255,255,.35)" strokeWidth=".18" />
+        <line x1="34" y1="100" x2="26" y2="98" stroke="rgba(255,255,255,.35)" strokeWidth=".18" />
       </g>
     </svg>
   );
