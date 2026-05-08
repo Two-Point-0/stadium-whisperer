@@ -229,6 +229,7 @@ function Index() {
   const [activeChip, setActiveChip] = useState<typeof CHIPS[number] | null>(null);
   const [chipTip, setChipTip] = useState<{ chip: typeof CHIPS[number]; x: number; y: number } | null>(null);
   const [toast, setToast] = useState<string>("");
+  const [editor, setEditor] = useState<null | { type: "gw" | "form" | "pred" | "pick"; id?: string }>(null);
 
   const [selectedMatch, setSelectedMatch] = useState(LIVE_MATCHES[0]);
 
