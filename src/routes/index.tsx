@@ -708,9 +708,13 @@ function Index() {
           <span className="nav-label">Sport</span>
           <span className="nav-sub">{sport.name}</span>
         </button>
-        <button className="open-btn" onClick={toggleRoof}>
-          <span className="ob-icon">{roofOpen ? "🏟️" : "🔒"}</span>
-          <span className="ob-lbl">{roofOpen ? "Close Roof" : "Open Roof"}</span>
+        <button className={"roof-toggle " + (roofOpen ? "is-open" : "")} onClick={toggleRoof} aria-label={roofOpen ? "Close roof" : "Open roof"}>
+          <span className="rt-arrows">
+            <span className="rt-arrow up">▲</span>
+            <span className="rt-arrow dn">▼</span>
+          </span>
+          <span className="rt-label">{roofOpen ? "Close Roof" : "Open Roof"}</span>
+          <span className="rt-sub">{roofOpen ? "Hide HQ + Standings" : "View HQ + Standings"}</span>
         </button>
         <button className="nav-btn" onClick={() => setPopup(popup === "league" ? null : "league")}>
           <span className="nav-icon">{league.icon}</span>
