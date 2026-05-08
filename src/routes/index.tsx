@@ -670,6 +670,84 @@ function Index() {
         </>
       )}
 
+      {/* Edit modal */}
+      {editor && (
+        <>
+          <div className="ed-overlay" onClick={() => setEditor(null)} />
+          <div className="ed-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="ed-close" onClick={() => setEditor(null)}>✕</button>
+            {editor.type === "gw" && (
+              <>
+                <div className="ed-title">🗓 Game Week</div>
+                <div className="ed-sub">Browse gameweeks and review your stats per round.</div>
+                <div className="ed-gw-display">
+                  <button className="gw-nav-btn" onClick={() => setGw(g => Math.max(1, g - 1))}>‹</button>
+                  <div className="gw-display" style={{ flex: 1 }}>
+                    <div className="gw-num">GW {gw}</div>
+                    <div className="gw-pts-big">+{32 + (gw % 5) * 6}</div>
+                    <div className="gw-meta">5 / 10 correct</div>
+                  </div>
+                  <button className="gw-nav-btn" onClick={() => setGw(g => Math.min(38, g + 1))}>›</button>
+                </div>
+                <div className="ed-grid">
+                  {Array.from({ length: 38 }).map((_, i) => (
+                    <button key={i} className={"ed-grid-cell " + (gw === i + 1 ? "sel" : "")} onClick={() => setGw(i + 1)}>{i + 1}</button>
+                  ))}
+                </div>
+              </>
+            )}
+            {editor.type === "form" && (
+              <>
+                <div className="ed-title">⚔ Formation Mode</div>
+                <div className="ed-sub">Pick how aggressive your prediction load is this season.</div>
+                {FORMATIONS.map((f, i) => (
+                  <button key={f.id} className={"ed-list-item " + (formIdx === i ? "sel" : "")} onClick={() => { setFormIdx(i); showToast(`Formation: ${f.name}`); }}>
+                    <span className="eli-name">{f.name}</span>
+                    <span className="eli-desc">{f.desc}</span>
+                  </button>
+                ))}
+              </>
+            )}
+            {editor.type === "pred" && editor.id && (() => {
+              const m = LIVE_MATCHES.find(x => x.id === editor.id)!;
+              const p = preds[m.id];
+              return (
+                <>
+                  <div className="ed-title">⚽ {m.h} vs {m.a}</div>
+                  <div className="ed-sub">{m.league} · {m.live ? `LIVE ${m.min}` : `Kick-off ${m.min}`}</div>
+                  {m.live && (
+                    <div className="ed-live-score">{m.hs} - {m.as}</div>
+                  )}
+                  <div style={{ fontFamily: "var(--cd)", fontSize: ".5rem", color: "rgba(200,244,0,.6)", letterSpacing: "1.5px", marginTop: 8 }}>YOUR PREDICTION</div>
+                  <div className="ed-score-row">
+                    <div className="ed-team-col">
+                      <div className="ed-team-nm">{m.h}</div>
+                      <div className="ed-stepper">
+                        <button onClick={() => updatePred(m.id, "h", String(Math.max(0, p.h - 1)))} disabled={p.locked}>−</button>
+                        <span>{p.h}</span>
+                        <button onClick={() => updatePred(m.id, "h", String(p.h + 1))} disabled={p.locked}>+</button>
+                      </div>
+                    </div>
+                    <div className="ed-vs">vs</div>
+                    <div className="ed-team-col">
+                      <div className="ed-team-nm">{m.a}</div>
+                      <div className="ed-stepper">
+                        <button onClick={() => updatePred(m.id, "a", String(Math.max(0, p.a - 1)))} disabled={p.locked}>−</button>
+                        <span>{p.a}</span>
+                        <button onClick={() => updatePred(m.id, "a", String(p.a + 1))} disabled={p.locked}>+</button>
+                      </div>
+                    </div>
+                  </div>
+                  <button className={"lock-btn " + (p.locked ? "locked" : "unlocked")} style={{ width: "100%", padding: "8px", fontSize: ".6rem", marginTop: 10 }} onClick={() => togglePredLock(m.id)}>
+                    {p.locked ? "🔒 LOCKED · tap to unlock (-1 yellow)" : "🔓 LOCK IN PICK"}
+                  </button>
+                </>
+              );
+            })()}
+          </div>
+        </>
+      )}
+
       {toast && <div className="toast">{toast}</div>}
     </div>
   );
