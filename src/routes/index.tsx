@@ -355,7 +355,10 @@ function Index() {
         {/* LEFT PANEL — Container 3 */}
         <aside className="side-panel left">
           <div className="panel-scroll">
-            <div className="sec">⚙ Predict Center</div>
+            <div className="sec">⚙ Predict Center · This Week</div>
+            <div style={{ fontFamily: "var(--cd)", fontSize: ".4rem", color: "var(--sub)", marginBottom: 5, lineHeight: 1.4 }}>
+              Set GW, formation, and score picks. Tap any match card to simulate it on the pitch.
+            </div>
 
             {/* GW scroll */}
             <div className="card">
