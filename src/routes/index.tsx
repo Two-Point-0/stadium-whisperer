@@ -694,20 +694,33 @@ function Index() {
         {/* RIGHT PANEL — Container 2 */}
         <aside className="side-panel right">
           <div className="panel-scroll">
-            <div className="sec">📡 Live Matches</div>
-            {LIVE_MATCHES.map(m => (
-              <div key={m.id} className={"match-pill " + (selectedMatch.id === m.id ? "sel" : "")} onClick={() => setSelectedMatch(m)}>
-                <span className="mp-vs">{m.h.slice(0, 7)} vs {m.a.slice(0, 7)}</span>
-                {m.live ? <span className="mp-sc">{m.hs}-{m.as}</span> : <span style={{ fontFamily: "var(--cd)", fontSize: ".45rem", color: "var(--sub)" }}>{m.min}</span>}
-                {m.live && <span className="live-pill"><span className="live-dot" />LIVE</span>}
+            {/* My Season snapshot — quick glance, deep view in roof Manager HQ */}
+            <div className="sec">📈 My Season</div>
+            <div className="card highlight" style={{ marginBottom: 6 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 5 }}>
+                <div className="acc-avatar" style={{ width: 28, height: 28, fontSize: ".9rem" }}>G</div>
+                <div style={{ flex: 1, overflow: "hidden" }}>
+                  <div className="acc-name" style={{ fontSize: ".78rem" }}>GAFFER_92</div>
+                  <div className="acc-rank">Rank #14,288 · Top 3%</div>
+                </div>
               </div>
-            ))}
-            <div style={{ fontFamily: "var(--cd)", fontSize: ".4rem", color: "var(--sub)", padding: "3px 4px", textAlign: "center" }}>Click a match to simulate on pitch</div>
+              <div className="stat3">
+                <div className="sc"><span className="sc-v">{points}</span><span className="sc-l">Total</span></div>
+                <div className="sc"><span className="sc-v">62</span><span className="sc-l">GW Best</span></div>
+                <div className="sc"><span className="sc-v">71%</span><span className="sc-l">Accuracy</span></div>
+              </div>
+              <div style={{ fontFamily: "var(--cd)", fontSize: ".4rem", color: "var(--sub)", textAlign: "center", marginTop: 4 }}>
+                Open the roof for full Manager HQ ↑
+              </div>
+            </div>
 
             <div className="divr" />
 
             {/* Season picks vs actual leaders */}
             <div className="sec">🥇 Season Picks vs Reality</div>
+            <div style={{ fontFamily: "var(--cd)", fontSize: ".4rem", color: "var(--sub)", marginBottom: 5, lineHeight: 1.4 }}>
+              Lock in your season-long bets. Unlock costs 1 yellow card.
+            </div>
 
             {[
               { key: "topScorer" as const, list: TOP_SCORERS, label: "Top Scorer" },
