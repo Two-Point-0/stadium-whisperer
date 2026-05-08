@@ -40,16 +40,16 @@ const FORMATIONS = [
   { id: "all", name: "ALL-IN", desc: "Every major league. Max chaos, max points (×2.5 XP)." },
 ];
 const CHIPS = [
-  { id: "ss", code: "SS", icon: "🎯", name: "Star Striker", pts: 30, color: "#ffd700",
-    fx: "3× points on your top pick", desc: "Triples the score awarded by your highest-rated prediction this gameweek.", how: "Tap PLAY before kick-off — applies to your single best pick of the GW." },
-  { id: "tr", code: "TR", icon: "♻️", name: "Tactical Reset", pts: 15, color: "#00d4ff",
-    fx: "Reshuffle picks free", desc: "Unlock and rewrite all locked predictions in this gameweek without earning yellow cards.", how: "Activate, then edit your locked predictions until kick-off." },
-  { id: "fs", code: "FS", icon: "🛡️", name: "Full Squad", pts: 20, color: "#c8f400",
-    fx: "Every bench prediction scores", desc: "Bench picks normally score half — Full Squad makes them score 100% for one GW.", how: "Activate before deadline; bench scoring runs at full weight." },
-  { id: "og", code: "OG", icon: "⚡", name: "One-Off Gambit", pts: 25, color: "#9b59b6",
-    fx: "Single GW power play", desc: "Doubles points on a single match of your choice during this gameweek.", how: "Pick your match in the predictions panel after activating." },
-  { id: "ds", code: "DS", icon: "💎", name: "Double Stakes", pts: 40, color: "#e63946",
-    fx: "Double next fixture points", desc: "Doubles the total points returned by your next selected live fixture, win or lose.", how: "Activate, then pick the live match you want doubled from the right panel." },
+  { id: "sn", code: "SN", icon: "🎯", name: "Sniper Pick", pts: 35, color: "#ffd700",
+    fx: "Exact scoreline = triple points", desc: "If you nail the precise final score of a match, points for that match are tripled.", how: "Activate before kick-off — applies to your most confident scoreline pick of the GW." },
+  { id: "rt", code: "RT", icon: "♻️", name: "Reset Tactics", pts: 15, color: "#00d4ff",
+    fx: "Re-pick locked predictions", desc: "Unlock and rewrite all locked score predictions for this gameweek without spending yellow cards.", how: "Activate, then edit any locked prediction until kick-off." },
+  { id: "cs", code: "CS", icon: "🥅", name: "Clean Sheet Call", pts: 25, color: "#c8f400",
+    fx: "Bonus if your team keeps shutout", desc: "Pick one team you predict will not concede. If they keep a clean sheet, you bag the bonus.", how: "Activate, then tap a team in any match card to mark them shutout." },
+  { id: "hh", code: "HH", icon: "🔥", name: "Hat-Trick Hunter", pts: 40, color: "#e63946",
+    fx: "Name a 3+ goal scorer", desc: "Pick a player you predict will score 3 or more goals in their next fixture for the maximum reward.", how: "Activate, then choose a player in the match HUD." },
+  { id: "gr", code: "GR", icon: "📊", name: "Goal Rush", pts: 30, color: "#9b59b6",
+    fx: "Total goals predictor bonus", desc: "Predict how many goals will be scored in total across one match. Closer = more points.", how: "Activate, then enter a total goals number in the match editor." },
 ];
 
 const BARCA_PLAYERS = [
@@ -606,28 +606,80 @@ function Index() {
           </div>
         </aside>
 
+        {/* ROOF RAILS — fixed tracks at the edges where the roof slides into */}
+        <div className="roof-rail left" />
+        <div className="roof-rail right" />
+
         {/* ROOF CURTAIN — body-level, covers everything edge-to-edge */}
         <div className={"roof body-roof " + roofAnim}>
           <div className="roof-half left">
-            <div className="roof-strip">
-              <span className="rs-tag">⚙</span>
-              <span className="rs-title">PREDICT CENTER</span>
-              <span className="rs-sub">GW · Discipline · Match Predictions</span>
+            {/* Team info header — always visible at top */}
+            <div className="roof-strip team-strip">
+              <div className="ts-avatar">G</div>
+              <div className="ts-info">
+                <div className="ts-name">GAFFER_92 <span className="ts-flag">🇪🇸</span></div>
+                <div className="ts-meta">FC Barcelona fan · Season 25/26</div>
+              </div>
+              <div className="ts-stat">
+                <span className="ts-v">{points}</span>
+                <span className="ts-l">PTS</span>
+              </div>
+              <div className="ts-stat gold">
+                <span className="ts-v">14k</span>
+                <span className="ts-l">RANK</span>
+              </div>
             </div>
             <div className="roof-mid">
-              <div className="roof-mid-line">— STADIUM ROOF CLOSED —</div>
-              <div className="roof-mid-hint">Tap OPEN ROOF below to access your dashboard</div>
+              <div className="rm-grid">
+                <div className="rm-card"><span className="rmc-v">71%</span><span className="rmc-l">Accuracy</span></div>
+                <div className="rm-card"><span className="rmc-v">62</span><span className="rmc-l">GW Best</span></div>
+                <div className="rm-card"><span className="rmc-v">{gw}</span><span className="rmc-l">GW</span></div>
+                <div className="rm-card"><span className="rmc-v">5/10</span><span className="rmc-l">Correct</span></div>
+              </div>
+              <div className="rm-pred-summary">
+                <div className="rmp-title">⚽ This GW · {Object.values(preds).filter(p=>p.locked).length}/{Object.keys(preds).length} predictions locked</div>
+                <div className="rmp-list">
+                  {LIVE_MATCHES.slice(0,3).map(m=>{
+                    const p = preds[m.id];
+                    return <div key={m.id} className="rmp-item">{m.h.slice(0,3).toUpperCase()} <span className="rmp-sc">{p.h}-{p.a}</span> {m.a.slice(0,3).toUpperCase()} {p.locked?"🔒":"🔓"}</div>;
+                  })}
+                </div>
+              </div>
+              <div className="roof-mid-hint">— Stadium Roof Closed · Tap OPEN ROOF to access full dashboard —</div>
             </div>
           </div>
           <div className="roof-half right">
-            <div className="roof-strip">
-              <span className="rs-tag">📈</span>
-              <span className="rs-title">SEASON OUTLOOK</span>
-              <span className="rs-sub">My Season · Picks · Standings</span>
+            <div className="roof-strip team-strip">
+              <div className="ts-trophy">🏆</div>
+              <div className="ts-info">
+                <div className="ts-name">LA LIGA · 2nd</div>
+                <div className="ts-meta">UCL group · 2nd · 13 pts</div>
+              </div>
+              <div className="ts-stat">
+                <span className="ts-v">33</span>
+                <span className="ts-l">L.LIGA</span>
+              </div>
+              <div className="ts-stat gold">
+                <span className="ts-v">13</span>
+                <span className="ts-l">UCL</span>
+              </div>
             </div>
             <div className="roof-mid">
-              <div className="roof-mid-line">— GAFFER'S PICK —</div>
-              <div className="roof-mid-hint">Stadium Predictor · Season 25/26</div>
+              <div className="rm-grid">
+                <div className="rm-card"><span className="rmc-v">10W</span><span className="rmc-l">Wins</span></div>
+                <div className="rm-card"><span className="rmc-v">3D</span><span className="rmc-l">Draws</span></div>
+                <div className="rm-card"><span className="rmc-v">1L</span><span className="rmc-l">Losses</span></div>
+                <div className="rm-card"><span className="rmc-v">+18</span><span className="rmc-l">GD</span></div>
+              </div>
+              <div className="rm-pred-summary">
+                <div className="rmp-title">🥇 Season Picks</div>
+                <div className="rmp-list">
+                  <div className="rmp-item">⚽ Top Scorer · <span className="rmp-sc">{seasonPicks.topScorer}</span> {picksLocked.topScorer?"🔒":"🔓"}</div>
+                  <div className="rmp-item">🅰 Top Assist · <span className="rmp-sc">{seasonPicks.topAssist}</span> {picksLocked.topAssist?"🔒":"🔓"}</div>
+                  <div className="rmp-item">🏆 Ballon d'Or · <span className="rmp-sc">{seasonPicks.ballonDor}</span> {picksLocked.ballonDor?"🔒":"🔓"}</div>
+                </div>
+              </div>
+              <div className="roof-mid-hint">— Standings · Mini-Leagues · Player Ratings hidden —</div>
             </div>
           </div>
         </div>
