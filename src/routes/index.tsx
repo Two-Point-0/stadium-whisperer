@@ -40,11 +40,11 @@ const FORMATIONS = [
   { id: "all", name: "ALL-IN", desc: "Every major league. Max chaos, max points (×2.5 XP)." },
 ];
 const CHIPS = [
-  { id: "tc", code: "TC", icon: "👑", name: "Triple Captain" },
-  { id: "wc", code: "WC", icon: "🃏", name: "Wildcard" },
-  { id: "bb", code: "BB", icon: "🪑", name: "Bench Boost" },
-  { id: "fh", code: "FH", icon: "🔄", name: "Free Hit" },
-  { id: "x2", code: "2X", icon: "✖️", name: "Double Down" },
+  { id: "ss", code: "SS", icon: "🎯", name: "Star Striker", pts: 30, desc: "3× points on your top pick this GW" },
+  { id: "tr", code: "TR", icon: "♻️", name: "Tactical Reset", pts: 15, desc: "Reshuffle all picks for free" },
+  { id: "fs", code: "FS", icon: "🛡️", name: "Full Squad", pts: 20, desc: "Every bench prediction scores" },
+  { id: "og", code: "OG", icon: "⚡", name: "One-Off Gambit", pts: 25, desc: "Single GW power play" },
+  { id: "ds", code: "DS", icon: "💎", name: "Double Stakes", pts: 40, desc: "Double points on next fixture" },
 ];
 
 const BARCA_PLAYERS = [
