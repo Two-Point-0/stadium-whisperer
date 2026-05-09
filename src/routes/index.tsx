@@ -1232,7 +1232,7 @@ function RatingPanel({
           return (
             <div className="rate-row2" key={p.id}>
               <span className="rr-num">#{p.n}</span>
-              <button className="rr-name" onClick={() => onPlayer(p.id)}>
+              <button className="rr-name" onClick={() => (onPlayer as (pid: string) => void)(p.id)}>
                 {p.name}
                 <span className="rr-pos">{p.pos}</span>
                 <span className="rr-avg">avg {playerAvg(p.id) || "—"}</span>
