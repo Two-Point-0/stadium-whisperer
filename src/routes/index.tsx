@@ -852,8 +852,8 @@ function Index() {
               getRating={getRating}
               setRating={setRating}
               playerAvg={playerAvg}
-              onPlayer={(pid) => setEditor({ type: "player", id: pid })}
-              onPick={(name) => setEditor({ type: "pickPlayer", data: name })}
+              onPlayer={(pid: string) => setEditor({ type: "player", id: pid })}
+              onPick={(name: string) => setEditor({ type: "pickPlayer", data: name })}
               leaders={data.leaders}
               picks={sp}
               labels={data.seasonPicksLabels}
