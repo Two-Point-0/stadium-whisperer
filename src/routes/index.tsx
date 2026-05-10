@@ -738,26 +738,28 @@ function Index() {
             </div>
 
             <div className="chip-rail left">
-              <div className="chip-rail-title">CHIPS</div>
+              <div className="chip-rail-title">ARM·{usedThisGw}/{maxThisGw}</div>
               {CHIPS.map((c) => {
                 const charges = chipCharges[c.id] || 0;
-                const out = charges <= 0;
-                const blocked = usedThisGw >= maxThisGw && !out;
+                const armed = (chipsByGw[gw] || []).includes(c.id);
+                const out = charges <= 0 && !armed;
+                const blocked = usedThisGw >= maxThisGw && !armed && !out;
                 return (
                   <button
                     key={c.id}
-                    className={"chip-btn " + (out ? "used " : "") + (chipFlash === c.id ? "flash " : "") + (blocked ? "blocked" : "")}
+                    className={"chip-btn " + (out ? "used " : "") + (chipFlash === c.id ? "flash " : "") + (blocked ? "blocked " : "") + (armed ? "armed" : "")}
                     style={{
                       borderColor: out ? "rgba(255,255,255,.08)" : `${c.color}55`,
                       background: out ? "linear-gradient(160deg,rgba(0,0,0,.55),rgba(10,20,30,.7))" : `linear-gradient(160deg,${c.color}1f,rgba(0,0,0,.6))`,
                     }}
-                    onClick={() => useChip(c.id)}
+                    onClick={() => armChip(c.id)}
                     onMouseEnter={(e) => {
                       const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
                       setChipTip({ chip: c, x: r.right + 8, y: r.top });
                     }}
                     onMouseLeave={() => setChipTip(null)}
                   >
+                    {armed && <span className="chip-armed-tag">ON</span>}
                     <span className="chip-icon">{c.icon}</span>
                     <span className="chip-code" style={{ color: c.color }}>{c.code}</span>
                     <span className="chip-pts">+{c.pts}</span>
