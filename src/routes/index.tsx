@@ -1277,13 +1277,13 @@ function Index() {
             {editor.type === "center" && (
               <>
                 <div className="ed-title">⚙ Predict Center · {sport.name}</div>
-                <div className="ed-sub">Quick view of GW, formation and discipline.</div>
+                <div className="ed-sub">Quick view of GW, mode and discipline.</div>
                 <div className="mini-row" style={{ marginBottom: 10 }}>
                   <div className="mini-chip"><span className="mini-lbl">GW</span><span className="mini-val">{gw}</span></div>
-                  <div className="mini-chip"><span className="mini-lbl">FORM</span><span className="mini-val">{formation.name}</span></div>
+                  <div className="mini-chip"><span className="mini-lbl">MODE</span><span className="mini-val">{mode.name}</span></div>
                   <div className="mini-chip"><span className="mini-lbl">CHIPS</span><span className="mini-val">{usedThisGw}/{maxThisGw}</span></div>
                 </div>
-                <div className="ed-sub">{formation.desc}</div>
+                <div className="ed-sub">{mode.desc}</div>
               </>
             )}
           </div>
