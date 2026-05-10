@@ -217,10 +217,15 @@ const SPORT_DATA: Record<string, any> = {
     surface: "f1",
     pitchLabel: "CIRCUIT",
     matches: [
-      { id: "f1", h: "Bahrain GP", a: "Race", hs: 0, as: 0, min: "Sun 15:00", live: false, league: "F1 R1" },
-      { id: "f2", h: "Saudi GP", a: "Race", hs: 0, as: 0, min: "Sat 18:00", live: false, league: "F1 R2" },
-      { id: "f3", h: "Australian GP", a: "Qualy", hs: 0, as: 0, min: "Sat 06:00", live: false, league: "F1 R3" },
+      { id: "f1p", h: "Practice", a: "Fastest Lap", hs: 0, as: 0, min: "Fri 14:30", live: false, league: "Bahrain GP · FP" },
+      { id: "f1q", h: "Qualifying", a: "Pole Position", hs: 0, as: 0, min: "Sat 18:00", live: false, league: "Bahrain GP · Q" },
+      { id: "f1r", h: "Race Day", a: "Grid 1-10", hs: 0, as: 0, min: "Sun 15:00", live: false, league: "Bahrain GP · R" },
     ],
+    lockedMatches: [
+      { id: "f2p", h: "Practice", a: "Fastest Lap", hs: 0, as: 0, min: "Fri 14:30", live: false, league: "Saudi GP · FP" },
+      { id: "f2q", h: "Qualifying", a: "Pole Position", hs: 0, as: 0, min: "Sat 18:00", live: false, league: "Saudi GP · Q" },
+    ],
+    circuits: ["Bahrain", "Jeddah", "Melbourne", "Suzuka", "Shanghai", "Miami", "Imola", "Monaco", "Montréal", "Barcelona", "Spielberg", "Silverstone", "Budapest", "Spa", "Zandvoort", "Monza", "Baku", "Singapore", "Austin", "México City", "Interlagos", "Las Vegas", "Lusail", "Abu Dhabi"],
     favTeam: "Ferrari",
     roster: [
       { id: "fp1", n: 16, name: "C. Leclerc", pos: "DRV" },
