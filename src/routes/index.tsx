@@ -615,47 +615,49 @@ function Index() {
         {/* LEFT PANEL */}
         <aside className="side-panel left">
           <div className="panel-scroll">
-            <div className="sec zoomable" onClick={() => openZoom("center")}>⚙ Predict Center · {sport.name}</div>
+            <div className="sec zoomable" onClick={() => openZoom("center")}>⚙ Prediction Stand · {sport.name}</div>
             <div style={{ fontFamily: "var(--cd)", fontSize: ".4rem", color: "var(--sub)", marginBottom: 5, lineHeight: 1.4 }}>
-              Set GW, formation, and {sport.id === "f1" ? "grid finish" : "score"} picks. Tap any card to simulate it on the {data.pitchLabel.toLowerCase()}.
-            </div>
-            <div className="mini-row">
-              <button className="mini-chip" onClick={() => setEditor({ type: "gw" })}>
-                <span className="mini-lbl">GW</span>
-                <span className="mini-val">{gw}</span>
-                <span className="mini-sub">+{32 + (gw % 5) * 6} pts</span>
-              </button>
-              <button className="mini-chip" onClick={() => setEditor({ type: "form" })}>
-                <span className="mini-lbl">FORM</span>
-                <span className="mini-val">{formation.name}</span>
-                <span className="mini-sub">tap to change</span>
-              </button>
+              {league.name} · GW {gw} · top-4 fixtures predictable. Use Full-GW Unlock chip to add the rest.
             </div>
 
-            <div className="sec" style={{ marginTop: 8 }}>🟨 Discipline · {usedThisGw}/{maxThisGw} chips this GW</div>
-            <div className="card-tracker">
-              <span className="card-lbl">YELLOW</span>
-              <div className="ycards-row">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <span key={i} className={"ycard-pip " + (i < yellows ? "earned" : "")} />
-                ))}
-              </div>
-              <span style={{ fontFamily: "var(--hd)", fontSize: ".7rem", color: "var(--gold)" }}>{yellows}</span>
+            {/* GW pager */}
+            <div className="pager3-label">Game Week</div>
+            <Pager3 value={gw} setValue={setGw} min={1} max={38} formatTag="GW" />
+
+            {/* Mode + Tactic pagers */}
+            <div className="pager3-label" style={{ marginTop: 8 }}>Mode</div>
+            <Pager3
+              value={modeIdx}
+              setValue={setModeIdx}
+              min={0}
+              max={MODES.length - 1}
+              labelFor={(i) => MODES[i].name}
+              formatTag="LEAGUES"
+              onCenterClick={() => setEditor({ type: "mode" })}
+            />
+            <div style={{ fontFamily: "var(--cd)", fontSize: ".4rem", color: "var(--sub)", padding: "3px 6px 0", lineHeight: 1.4 }}>{mode.desc}</div>
+
+            <div className="pager3-label" style={{ marginTop: 8 }}>Tactic · GW {gw}</div>
+            <div className="tag-row">
+              {TACTICS.map((t) => (
+                <button key={t.id} className={"tag-chip " + (tacticId === t.id ? "on " + t.cls : "")} onClick={() => { setTactic(t.id); showToast(`Tactic: ${t.name}`); }}>{t.name}</button>
+              ))}
             </div>
-            <div className="card-tracker">
-              <span className="card-lbl">RED</span>
-              <div className="ycards-row">
-                {reds === 0 && <span style={{ fontFamily: "var(--cd)", fontSize: ".42rem", color: "var(--sub)" }}>None — clean run</span>}
-              </div>
-              <span style={{ fontFamily: "var(--hd)", fontSize: ".7rem", color: "var(--red)" }}>{reds}</span>
+            <div style={{ fontFamily: "var(--cd)", fontSize: ".38rem", color: "var(--sub)", padding: "0 4px", lineHeight: 1.4 }}>{tactic.desc}</div>
+
+            <div className="sec" style={{ marginTop: 8 }}>🟨 Discipline</div>
+            <div className="ref-stack">
+              <div className="ref-card y" title="Yellow: unlock 1 locked prediction"><span className="refc-icon y" /><span className="refc-v">{yellows}</span><span className="refc-l">Yellow</span></div>
+              <div className="ref-card r" title="Red: wipe a bad GW (floor at 0)"><span className="refc-icon r" /><span className="refc-v">{reds}</span><span className="refc-l">Red</span></div>
+              <div className="ref-card p" title="Penalty: missed a top-4 prediction (-10 pts each)"><span className="refc-icon p" /><span className="refc-v">{penalties}</span><span className="refc-l">Pen</span></div>
             </div>
-            <div style={{ fontFamily: "var(--cd)", fontSize: ".4rem", color: "var(--sub)", padding: "3px 6px" }}>
-              Chips: 8 charges each · 2 plays/GW · 3 plays GW 34-38
+            <div style={{ fontFamily: "var(--cd)", fontSize: ".38rem", color: "var(--sub)", padding: "0 6px 4px", lineHeight: 1.4 }}>
+              {usedThisGw}/{maxThisGw} chips armed · {flUnlocked ? "🌐 GW unlocked" : "Top-4 only"}
             </div>
 
             <div className="divr" />
 
-            <div className="sec zoomable" onClick={() => openZoom("matches")}>{sport.id === "f1" ? "🏁 Race Predictions" : "⚽ Match Predictions"} · GW {gw}</div>
+            <div className="sec zoomable" onClick={() => openZoom("matches")}>{sport.id === "f1" ? "🏁 Race Predictions" : "⚽ Top-4 Predictions"} · GW {gw}</div>
             {data.matches.map((m: any) => {
               const p = preds[m.id] || { h: 0, a: 0, locked: false };
               return (
@@ -687,6 +689,40 @@ function Index() {
                 </div>
               );
             })}
+
+            {/* Locked rest of GW (visible-but-not-selectable unless FL chip armed) */}
+            {(data.lockedMatches || []).length > 0 && (
+              <>
+                <div className="sec" style={{ marginTop: 6, color: flUnlocked ? "var(--lime)" : "var(--sub)" }}>
+                  {flUnlocked ? "🌐 Unlocked Rest of GW" : "🔒 Rest of GW (Full-Unlock Chip)"}
+                </div>
+                {data.lockedMatches.map((m: any) => {
+                  const p = preds[m.id] || { h: 0, a: 0, locked: false };
+                  return (
+                    <div key={m.id} className={"pred-card " + (flUnlocked ? "" : "locked-fix")} onClick={() => flUnlocked && (setSelectedMatch(m), setEditor({ type: "pred", id: m.id }))}>
+                      <div className="pc-head">
+                        <span className="pc-time">{m.min}</span>
+                        <span className="pred-locked-tag">{flUnlocked ? "OPEN" : "LOCKED"}</span>
+                      </div>
+                      <div className="pc-teams">
+                        <span className="pc-tn">{m.h}</span>
+                        <span className="pc-tn a">{m.a}</span>
+                      </div>
+                      {flUnlocked && (
+                        <div className="pred-row">
+                          <span className="pred-lbl">PICK</span>
+                          <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
+                            <input className="sinp" value={p.h} onChange={(e) => updatePred(m.id, "h", e.target.value)} onClick={(e) => e.stopPropagation()} />
+                            <span style={{ fontFamily: "var(--hd)", color: "var(--sub)" }}>-</span>
+                            <input className="sinp" value={p.a} onChange={(e) => updatePred(m.id, "a", e.target.value)} onClick={(e) => e.stopPropagation()} />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </>
+            )}
           </div>
         </aside>
 
