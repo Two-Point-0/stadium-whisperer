@@ -1329,3 +1329,79 @@ function RatingPanel({
     </div>
   );
 }
+
+/* ---------- 3-circle pager (GW / Mode / etc.) ---------- */
+function Pager3({
+  value, setValue, min, max, formatTag, labelFor, onCenterClick,
+}: {
+  value: number; setValue: (n: number) => void; min: number; max: number;
+  formatTag?: string; labelFor?: (i: number) => string; onCenterClick?: () => void;
+}) {
+  const left = value - 1;
+  const right = value + 1;
+  const fmt = (i: number) => labelFor ? labelFor(i) : String(i);
+  return (
+    <div className="pager3">
+      <button className="pager3-arrow" onClick={() => setValue(Math.max(min, value - 1))} disabled={value <= min} aria-label="Prev">‹</button>
+      <div className="pager3-track">
+        {left >= min ? (
+          <button className="pager3-circ side" onClick={() => setValue(left)}>
+            {formatTag && <span className="p3-tag">{formatTag}</span>}
+            <span>{fmt(left)}</span>
+          </button>
+        ) : <span className="pager3-circ side" style={{ visibility: "hidden" }} />}
+        <button className="pager3-circ center" onClick={onCenterClick}>
+          {formatTag && <span className="p3-tag">{formatTag}</span>}
+          <span>{fmt(value)}</span>
+        </button>
+        {right <= max ? (
+          <button className="pager3-circ side" onClick={() => setValue(right)}>
+            {formatTag && <span className="p3-tag">{formatTag}</span>}
+            <span>{fmt(right)}</span>
+          </button>
+        ) : <span className="pager3-circ side" style={{ visibility: "hidden" }} />}
+      </div>
+      <button className="pager3-arrow" onClick={() => setValue(Math.min(max, value + 1))} disabled={value >= max} aria-label="Next">›</button>
+    </div>
+  );
+}
+
+/* ---------- Back stand: standings + stat leaders ---------- */
+export function BackStand({ data, league, position }: { data: any; league: any; position: "top" | "bottom" }) {
+  if (position === "top") {
+    return (
+      <div className="back-stand">
+        <span className="bs-title">{league?.name || "League"} TABLE</span>
+        <div className="bs-scroll">
+          {data.standings.map((s: any, i: number) => (
+            <span key={s.team} className={"bs-row " + (s.me ? "me" : "")}>
+              <span className="bs-pos">{i + 1}</span>
+              <span className="bs-team">{s.team}</span>
+              <span className="bs-pts">{s.pts}</span>
+            </span>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  // bottom: stat leaders
+  const labels = data.seasonPicksLabels;
+  return (
+    <div className="back-stand bottom">
+      <span className="bs-title">STAT LEADERS</span>
+      <div className="bs-scroll">
+        {(["a", "b", "c", "d"] as const).map((k) => {
+          const top = data.leaders[k]?.[0];
+          if (!top) return null;
+          return (
+            <span key={k} className="bs-stat">
+              <span className="bs-stat-lbl">{labels[k]}</span>
+              <span className="bs-stat-name">{top.name}</span>
+              <span className="bs-stat-val">{top.val}</span>
+            </span>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
