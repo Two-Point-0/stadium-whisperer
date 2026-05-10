@@ -1039,16 +1039,33 @@ function Index() {
               </>
             )}
 
-            {editor.type === "form" && (
+            {(editor.type === "form" || editor.type === "mode") && (
               <>
-                <div className="ed-title">⚔ Formation Mode</div>
-                <div className="ed-sub">Pick how aggressive your prediction load is this season.</div>
-                {FORMATIONS.map((f, i) => (
-                  <button key={f.id} className={"ed-list-item " + (formIdx === i ? "sel" : "")} onClick={() => { setFormIdx(i); showToast(`Formation: ${f.name}`); }}>
+                <div className="ed-title">⚔ Season League Mode</div>
+                <div className="ed-sub">How many leagues you commit to predicting all 38 GWs. Locked at GW 1 — choose carefully.</div>
+                {MODES.map((f, i) => (
+                  <button key={f.id} className={"ed-list-item " + (modeIdx === i ? "sel" : "")} onClick={() => { setModeIdx(i); showToast(`Mode: ${f.name}`); }}>
                     <span className="eli-name">{f.name}</span>
                     <span className="eli-desc">{f.desc}</span>
                   </button>
                 ))}
+              </>
+            )}
+
+            {editor.type === "armChips" && (
+              <>
+                <div className="ed-title">🎯 Arm Chips · GW {gw}</div>
+                <div className="ed-sub">Pick the {maxThisGw} chips that fire this GW. Click an armed chip again to disarm and refund.</div>
+                {CHIPS.map((c) => {
+                  const armed = (chipsByGw[gw] || []).includes(c.id);
+                  const charges = chipCharges[c.id] || 0;
+                  return (
+                    <button key={c.id} className={"ed-list-item " + (armed ? "sel" : "")} onClick={() => armChip(c.id)} disabled={charges <= 0 && !armed}>
+                      <span className="eli-name">{c.icon} {c.name} {armed ? "· ARMED" : ""}</span>
+                      <span className="eli-desc">{c.desc} · {charges}/8 charges left</span>
+                    </button>
+                  );
+                })}
               </>
             )}
 
