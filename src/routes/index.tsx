@@ -1305,19 +1305,7 @@ function RatingPanel({
         <div className="ratp-title">⭐ Rate Your Squad · GW {gw}</div>
         <div className="ratp-sub">Scroll the whistle rail to switch GW. Tap a player to see their season curve.</div>
       </div>
-      <div className="whistle-rail">
-        <button className="whistle-btn" onClick={() => setGw(Math.max(1, gw - 1))} aria-label="Prev GW">‹</button>
-        <div className="whistle-scroll">
-          {Array.from({ length: 38 }).map((_, i) => (
-            <button key={i} className={"whistle " + (gw === i + 1 ? "act" : "")} onClick={() => setGw(i + 1)}>
-              <span className="whistle-hole" />
-              <span className="whistle-gw">GW</span>
-              <span className="whistle-num">{i + 1}</span>
-            </button>
-          ))}
-        </div>
-        <button className="whistle-btn" onClick={() => setGw(Math.min(38, gw + 1))} aria-label="Next GW">›</button>
-      </div>
+      <Pager3 value={gw} setValue={setGw} min={1} max={38} formatTag="GW" />
       <div className="rating-list">
         {roster.map((p: any) => {
           const r = getRating(p.id, gw);
