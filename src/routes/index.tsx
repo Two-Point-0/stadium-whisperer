@@ -295,7 +295,7 @@ function GoalAd({ position }: { position: "top" | "bottom" }) {
   const ad = GOAL_ADS[idx];
   const src = `https://www.youtube.com/embed/${ad.vid}?autoplay=1&mute=1&loop=1&playlist=${ad.vid}&controls=0&modestbranding=1&playsinline=1&start=${ad.start}&rel=0`;
   return (
-    <div className={"goal-ad " + position} key={ad.id} style={{ borderColor: ad.color }}>
+    <div className={"goal-ad led " + position} key={ad.id} style={{ borderColor: ad.color }}>
       <iframe
         title={ad.brand}
         src={src}
