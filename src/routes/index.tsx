@@ -451,12 +451,15 @@ function Index() {
   useEffect(() => {
     setPreds((prev) => {
       const next = { ...prev };
-      data.matches.forEach((m: any) => {
+      [...(data.matches || []), ...(data.lockedMatches || [])].forEach((m: any) => {
         if (!next[m.id]) next[m.id] = { h: 1, a: 1, locked: false };
       });
       return next;
     });
   }, [data]);
+
+  // Full-GW unlock chip armed for current GW?
+  const flUnlocked = (chipsByGw[gw] || []).includes("fl");
 
   // season picks per sport
   const [seasonPicks, setSeasonPicks] = useState<Record<string, any>>({});
