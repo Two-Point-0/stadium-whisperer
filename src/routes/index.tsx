@@ -816,6 +816,8 @@ function Index() {
           </div>
 
           {data.surface === "football" && <GoalAd position="bottom" />}
+          {/* Bottom back-stand (stat leaders) */}
+          <BackStand data={data} league={league} position="bottom" />
         </main>
 
         {/* RIGHT PANEL */}
