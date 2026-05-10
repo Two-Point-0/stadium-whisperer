@@ -505,15 +505,25 @@ function Index() {
 
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2400); };
 
-  const useChip = (id: string) => {
+  /* Arm/disarm a chip for the current GW. Per-GW limit: 2 (3 in GW 34-38). */
+  const armChip = (id: string) => {
     const chip = CHIPS.find((c) => c.id === id)!;
+    const armed = chipsByGw[gw] || [];
+    const isArmed = armed.includes(id);
+    if (isArmed) {
+      // disarm — refund the charge
+      setChipsByGw((m) => ({ ...m, [gw]: armed.filter((x) => x !== id) }));
+      setChipCharges((c) => ({ ...c, [id]: (c[id] || 0) + 1 }));
+      showToast(`${chip.icon} ${chip.name} disarmed`);
+      return;
+    }
     if ((chipCharges[id] || 0) <= 0) return showToast(`${chip.name}: out of charges`);
-    if (usedThisGw >= maxThisGw) return showToast(`Max ${maxThisGw} chips this GW`);
+    if (armed.length >= maxThisGw) return showToast(`Max ${maxThisGw} chips armed this GW`);
     setChipCharges((c) => ({ ...c, [id]: c[id] - 1 }));
-    setChipsByGw((m) => ({ ...m, [gw]: [...(m[gw] || []), id] }));
+    setChipsByGw((m) => ({ ...m, [gw]: [...armed, id] }));
     setChipFlash(id);
     setActiveChip(chip);
-    showToast(`${chip.icon} ${chip.name} · +${chip.pts} pts`);
+    showToast(`${chip.icon} ${chip.name} armed for GW ${gw}`);
     setPoints((p) => p + chip.pts);
     setPtsFloat({ id: Date.now(), v: chip.pts });
     setTimeout(() => setPtsFloat(null), 1100);
