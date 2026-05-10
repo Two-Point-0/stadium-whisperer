@@ -728,6 +728,8 @@ function Index() {
 
         {/* PITCH WRAP */}
         <main className="pitch-wrap">
+          {/* Top back-stand (league standings) */}
+          <BackStand data={data} league={league} position="top" />
           {/* TOP goal-end ad behind goalpost */}
           {data.surface === "football" && <GoalAd position="top" />}
 
