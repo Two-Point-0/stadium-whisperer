@@ -416,11 +416,17 @@ function Index() {
   const data = useMemo(() => SPORT_DATA[sport.id] || SPORT_DATA.football, [sport]);
 
   const [gw, setGw] = useState(14);
-  const [formIdx, setFormIdx] = useState(0);
-  const formation = FORMATIONS[formIdx];
+  const [modeIdx, setModeIdx] = useState(1); // 1v1 / 2v2 / 3v3
+  const mode = MODES[modeIdx];
+  const [tacticByGw, setTacticByGw] = useState<Record<number, string>>({});
+  const tacticId = tacticByGw[gw] || "balanced";
+  const tactic = TACTICS.find((t) => t.id === tacticId)!;
+  const setTactic = (id: string) => setTacticByGw((m) => ({ ...m, [gw]: id }));
 
-  const [yellows, setYellows] = useState(2);
-  const [reds] = useState(0);
+  /* Discipline cards: 3 yellows / 1 red / penalty counter */
+  const [yellows, setYellows] = useState(3);
+  const [reds, setReds] = useState(1);
+  const [penalties, setPenalties] = useState(0);
 
   /* Chip charges + per-GW usage */
   const [chipCharges, setChipCharges] = useState<Record<string, number>>(() =>
