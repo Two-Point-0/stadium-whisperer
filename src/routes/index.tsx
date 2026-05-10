@@ -29,11 +29,17 @@ const LEAGUES = [
   { id: "bundesliga", name: "Bundesliga", icon: "🇩🇪" },
   { id: "ligue1", name: "Ligue 1", icon: "🇫🇷" },
 ];
-const FORMATIONS = [
-  { id: "1v1", name: "1V1", desc: "Pick 1 league + 1 cup. Focused predictions, biggest XP multiplier (×1.0)." },
-  { id: "2v2", name: "2V2", desc: "Two leagues + UCL. Balanced load (×1.4 XP)." },
-  { id: "3v3", name: "3V3", desc: "Three leagues + UCL + UEL. Heavy schedule (×1.8 XP)." },
-  { id: "all", name: "ALL-IN", desc: "Every major league. Max chaos, max points (×2.5 XP)." },
+/* League slot mode — locks how many leagues you predict the WHOLE season */
+const MODES = [
+  { id: "1v1", name: "1v1", desc: "Lock 1 league all season. Max focus, ×1.0 XP, biggest per-correct multiplier." },
+  { id: "2v2", name: "2v2", desc: "Lock 2 leagues. Balanced spread, ×1.4 XP." },
+  { id: "3v3", name: "3v3", desc: "Lock 3 leagues. Wide net, ×1.8 XP, smaller multiplier." },
+];
+/* Per-GW Tactic — adjusts scoring for that GW */
+const TACTICS = [
+  { id: "attack", name: "Attack", cls: "ack", desc: "+25% scorer pts · −25% clean-sheet pts" },
+  { id: "balanced", name: "Balanced", cls: "bal", desc: "Flat scoring across the GW" },
+  { id: "park", name: "Park-the-bus", cls: "", desc: "+50% on 0-0 / clean sheet · −25% on scorers" },
 ];
 
 /* Chips: 8 charges each. 2 plays per GW; 3 plays during the final 5 GWs (34-38). */
