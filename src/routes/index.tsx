@@ -68,6 +68,13 @@ const SPORT_DATA: Record<string, any> = {
       { id: "m4", h: "PSG", a: "Marseille", hs: 0, as: 0, min: "20:00", live: false, league: "Ligue 1" },
       { id: "m5", h: "Inter", a: "Juventus", hs: 0, as: 0, min: "21:45", live: false, league: "Serie A" },
     ],
+    /* Visible-but-locked unless Full GW Unlock chip is armed */
+    lockedMatches: [
+      { id: "lm1", h: "Brighton", a: "Brentford", hs: 0, as: 0, min: "17:30", live: false, league: "EPL" },
+      { id: "lm2", h: "Getafe", a: "Cadiz", hs: 0, as: 0, min: "19:00", live: false, league: "La Liga" },
+      { id: "lm3", h: "Lecce", a: "Empoli", hs: 0, as: 0, min: "18:30", live: false, league: "Serie A" },
+      { id: "lm4", h: "Wolfsburg", a: "Mainz", hs: 0, as: 0, min: "15:30", live: false, league: "Bundesliga" },
+    ],
     favTeam: "FC Barcelona",
     roster: [
       { id: "p1", n: 1, name: "Ter Stegen", pos: "GK" },
