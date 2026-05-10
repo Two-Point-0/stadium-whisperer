@@ -527,3 +527,86 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .card.highlight{background:linear-gradient(160deg,rgba(200,244,0,.06),rgba(0,0,0,.5));border-color:rgba(200,244,0,.18)}
 
 /* Hide unused legacy roof-mid elements (kept in CSS for safety) */
+
+/* ============ NEW: 3-circle pager ============ */
+.pager3{display:flex;align-items:center;gap:5px;background:linear-gradient(180deg,rgba(0,0,0,.45),rgba(0,0,0,.25));border:1px solid rgba(200,244,0,.2);border-radius:30px;padding:4px 6px}
+.pager3-arrow{width:22px;height:22px;border-radius:50%;border:1px solid rgba(200,244,0,.3);background:rgba(200,244,0,.06);color:var(--lime);font-family:var(--hd);font-size:.8rem;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;line-height:1}
+.pager3-arrow:hover{background:rgba(200,244,0,.18)}
+.pager3-arrow:disabled{opacity:.25;cursor:not-allowed}
+.pager3-track{flex:1;display:flex;align-items:center;justify-content:center;gap:6px}
+.pager3-circ{width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.55);color:var(--sub);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--hd);font-size:.6rem;letter-spacing:.5px;cursor:pointer;transition:all .14s;line-height:1;padding:2px}
+.pager3-circ.side{opacity:.5;transform:scale(.85)}
+.pager3-circ.center{width:46px;height:46px;font-size:1rem;border-color:var(--lime);background:radial-gradient(circle at 35% 30%,rgba(200,244,0,.3),rgba(0,0,0,.6));color:var(--lime);box-shadow:0 0 12px rgba(200,244,0,.4),inset 0 0 6px rgba(200,244,0,.2)}
+.pager3-circ.center .p3-tag{font-size:.36rem;color:rgba(200,244,0,.7);letter-spacing:.8px}
+.pager3-circ .p3-tag{font-family:var(--cd);font-size:.32rem;color:var(--sub);letter-spacing:.4px}
+.pager3-label{font-family:var(--cd);font-size:.4rem;letter-spacing:1.5px;color:rgba(200,244,0,.55);font-weight:800;text-align:center;margin-bottom:3px;text-transform:uppercase}
+
+/* ============ Ref cards (yellow/red/penalty) ============ */
+.ref-stack{display:flex;gap:5px;margin-bottom:6px}
+.ref-card{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;border-radius:6px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.06);cursor:pointer;transition:all .14s}
+.ref-card:hover{border-color:rgba(200,244,0,.3)}
+.ref-card.y{background:linear-gradient(160deg,rgba(255,215,0,.18),rgba(0,0,0,.5));border-color:rgba(255,215,0,.4)}
+.ref-card.r{background:linear-gradient(160deg,rgba(230,57,70,.18),rgba(0,0,0,.5));border-color:rgba(230,57,70,.4)}
+.ref-card.p{background:linear-gradient(160deg,rgba(0,212,255,.13),rgba(0,0,0,.5));border-color:rgba(0,212,255,.35)}
+.refc-icon{width:14px;height:18px;border-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.5)}
+.refc-icon.y{background:var(--gold)}
+.refc-icon.r{background:var(--red)}
+.refc-icon.p{background:repeating-linear-gradient(45deg,#000 0 3px,#fff 3px 6px)}
+.refc-v{font-family:var(--hd);font-size:.78rem;color:var(--lime);line-height:1}
+.refc-l{font-family:var(--cd);font-size:.36rem;color:var(--sub);letter-spacing:1px;text-transform:uppercase}
+
+/* ============ Locked prediction (visible-but-grey) ============ */
+.pred-card.locked-fix{opacity:.55;filter:grayscale(.3);cursor:default}
+.pred-card.locked-fix:hover{border-color:var(--border);background:rgba(0,0,0,.44)}
+.pred-locked-tag{font-family:var(--cd);font-size:.4rem;color:rgba(255,215,0,.7);letter-spacing:1px;background:rgba(255,215,0,.08);padding:1px 5px;border-radius:8px;border:1px solid rgba(255,215,0,.25)}
+
+/* ============ Back stands (standings + stat leaders) ============ */
+.back-stand{flex-shrink:0;background:linear-gradient(180deg,#040d18,#020810);border-bottom:1px solid rgba(200,244,0,.1);padding:6px 12px;display:flex;align-items:center;gap:10px;overflow:hidden;position:relative;z-index:5;min-height:40px}
+.back-stand.bottom{border-bottom:none;border-top:1px solid rgba(200,244,0,.1)}
+.bs-title{font-family:var(--hd);font-size:.6rem;letter-spacing:1.6px;color:var(--lime);flex-shrink:0;padding-right:8px;border-right:1px solid rgba(200,244,0,.18)}
+.bs-scroll{flex:1;display:flex;gap:6px;overflow-x:auto;align-items:center;scrollbar-width:none}
+.bs-scroll::-webkit-scrollbar{height:0}
+.bs-row{flex-shrink:0;display:flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.06);font-family:var(--cd);font-size:.5rem;font-weight:700;white-space:nowrap}
+.bs-row.me{background:rgba(200,244,0,.07);border-color:rgba(200,244,0,.3)}
+.bs-pos{font-family:var(--hd);font-size:.6rem;color:var(--gold)}
+.bs-team{color:var(--text)}
+.bs-pts{color:var(--lime);font-family:var(--hd);font-size:.65rem}
+.bs-stat{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-start;padding:3px 9px;border-radius:6px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.06);min-width:90px}
+.bs-stat-lbl{font-family:var(--cd);font-size:.36rem;color:rgba(200,244,0,.55);letter-spacing:1px}
+.bs-stat-name{font-family:var(--cd);font-size:.52rem;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.bs-stat-val{font-family:var(--hd);font-size:.7rem;color:var(--lime)}
+
+/* ============ LED billboard look ============ */
+.goal-ad.led{height:clamp(40px,5.4vw,62px);border-top-width:3px;border-bottom-width:3px;background:#000;position:relative}
+.goal-ad.led::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.12) 1px,transparent 1.5px);background-size:6px 6px;pointer-events:none;z-index:3;opacity:.5;mix-blend-mode:overlay}
+.goal-ad.led::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.06) 40%,rgba(255,255,255,.18) 50%,rgba(255,255,255,.06) 60%,transparent 100%);background-size:200% 100%;animation:ledShine 6s linear infinite;pointer-events:none;z-index:2}
+@keyframes ledShine{from{background-position:200% 0}to{background-position:-200% 0}}
+
+/* ============ Roof rolling fabric edges ============ */
+.roof-half::before{content:"";position:absolute;top:0;bottom:0;width:18px;background:repeating-linear-gradient(90deg,rgba(200,244,0,.2) 0 2px,rgba(0,0,0,.5) 2px 4px);box-shadow:0 0 14px rgba(200,244,0,.25);z-index:5;pointer-events:none}
+.roof-half.left::before{right:0;border-radius:2px}
+.roof-half.right::before{left:0;border-radius:2px}
+.roof.opening .roof-half::before,.roof.closing .roof-half::before{animation:rollEdge .6s linear infinite}
+@keyframes rollEdge{from{background-position:0 0}to{background-position:0 8px}}
+
+/* ============ Pitch-shaped transparent editor (mobile) ============ */
+@media (max-width:680px){
+  .ed-modal{width:96vw;max-height:78vh}
+  .ed-modal.ed-zoom,.ed-modal{width:96vw}
+  .side-panel{--panel-w:42vw}
+  .chip-rail{width:38px}
+}
+.ed-modal.ed-pitch{background:linear-gradient(180deg,rgba(20,90,30,.94),rgba(8,40,15,.95));border:2px solid rgba(255,255,255,.5);border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,.85),inset 0 0 0 4px rgba(255,255,255,.08)}
+.ed-modal.ed-pitch::before{content:"";position:absolute;inset:6px;border:2px solid rgba(255,255,255,.35);border-radius:10px;pointer-events:none}
+
+/* ============ Tactic / Mode tag chips inline ============ */
+.tag-row{display:flex;gap:5px;margin-bottom:6px;flex-wrap:wrap}
+.tag-chip{padding:4px 8px;border-radius:14px;font-family:var(--cd);font-size:.48rem;font-weight:800;letter-spacing:1px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.08);color:var(--sub);cursor:pointer;text-transform:uppercase;transition:all .12s}
+.tag-chip:hover{border-color:rgba(200,244,0,.4);color:var(--text)}
+.tag-chip.on{background:var(--lime);color:#000;border-color:var(--lime)}
+.tag-chip.on.ack{background:var(--red);border-color:var(--red);color:#fff}
+.tag-chip.on.bal{background:var(--gold);border-color:var(--gold);color:#000}
+
+/* ============ Chip rail armed badge ============ */
+.chip-rail .chip-btn.armed{border-color:var(--lime)!important;box-shadow:0 0 0 2px rgba(200,244,0,.7),0 0 18px rgba(200,244,0,.4);background:linear-gradient(160deg,rgba(200,244,0,.28),rgba(0,0,0,.5))!important}
+.chip-rail .chip-btn .chip-armed-tag{position:absolute;top:2px;right:2px;font-family:var(--hd);font-size:.36rem;background:var(--lime);color:#000;padding:0 3px;border-radius:6px;letter-spacing:.5px}

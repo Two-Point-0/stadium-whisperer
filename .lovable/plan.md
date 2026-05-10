@@ -1,61 +1,107 @@
-## Scope
+# Stadium Layout & Prediction System Overhaul
 
-Big update across `src/routes/index.tsx` and `src/styles.css`. No backend changes.
+Single-pass refactor of `src/routes/index.tsx` and `src/styles.css`. No backend.
 
-## 1. Sport-aware data switching
+## 1. Roof-open left container = "Prediction Stand"
 
-- Define `SPORT_DATA` map keyed by sport (`football`, `basketball`, `tennis`, `f1`, etc. — match existing sport chips). for F1 input the whole season,and track should load on the pitch container,and predictions should be like how the grid will finish,from practice to qualifying) do that for all other sports,and its content should load up when selected on the sports button.
-- Each entry contains: matches list, season picks (top scorer / assist / MVP equivalent), standings, fav team roster, pitch surface class.
-- All containers (Predict Center matches, Season Picks labels, Standings, Manager HQ roster) read from current sport's slice via a `useMemo` derived from `activeSport`.
-- Pitch wrapper gets a `data-surface={sport}` attribute; CSS swaps background (grass / hardwood / clay / asphalt) and hides goalposts when not football.
+- Header: current league (from top menu) + GW number.
+- **Selectable predictions**: only the **top 4 teams per league** (football). For each match involving any top-4 team, render a prediction card with score + scorer pickers.
+- **Visible-but-locked rows**: the rest of that GW's fixtures from the same league rendered greyed out with a small lock badge. They become selectable only if the user has activated the **"Full GW Unlock" chip** for that GW.
+- Sport-aware: `SPORT_DATA` extended so each sport defines its own `getPredictables(gw)` and `getLockedRest(gw)`.
+  - Football → top-4 of selected league.
+  - Basketball → top-4 conference seeds for that night.
+  - Tennis → top-4 seeds active that round.
+  - F1 → single GP per "GW" with 3 prediction phases: Practice (FP fastest), Qualifying (pole + Q3 order), Race (full grid 1-10). All 3 always shown. input all circuit tracks ( remove from the internet to be scrolled throughtout the season)
+- all containers when selectet should pop up in het area of the pitch to make it seem like ou are doing the editing on the pitch,hence a transparent pop up in the shape of the pitch. make better ui for mobile version even if it means shrinking all containers so that the pitch is still centered,and when you select the shrinked container,eg for prediction,it pops up a transparent container size of pitch to do your editng there or view
 
-## 2. Roof-closed panels = season player ratings
+## 2. GW scroller = 3-circle pager
 
-- When roof is closed, each roof half shows: fav team crest header + horizontal scroller of all 38 GWs.( and this is where you edit your fav team throughout the season rating it per game,per player,so the interaction and rating should be poping up on the closed roof containers for editing and saving.
-- Each GW chip styled as a **whistle** (silver pill with a hole + lanyard, custom SVG/CSS).
-- Tapping a GW expands the squad list inline; each player row has a 1-10 rating stepper.(scroll through different  gw,hence only displaying one at a time
-- Ratings persist in `playerRatings` state: `{ [playerId]: { [gw]: number } }`.
-- Tapping a player name (anywhere) opens a modal showing their season rating curve + average + per-GW list.( and an option if you want to select him as one of your picks as per stats,ie if he is currently leading top goalscorer,option to ask client to unlock his previous pick and select him. 
-- also input a part on the roof panels containers with social media icons when client clicks on any it opens the SM account entered there and displays it,so that one can go through his sm accounts on the app 
+Replace the long whistle strip with a compact pager:
 
-## 3. Roof-open container popups (zoom mode)
+```text
+  ◄  (gw-1)   ●(gw)   (gw+1)  ►
+```
 
-- Existing `editor` modal pattern extended: every panel section (Predict Center, Discipline, Match Predictions, My Season, Season Picks, Standings, Mini-Leagues) becomes clickable when roof is open.
-- Click → opens enlarged `ed-modal` variant (`ed-modal--zoom`, ~85vw / 80vh) with the same content rendered larger and editable.
+- Three circles; middle is highlighted/active. Side circles show neighbour numbers, dimmer.
+- Arrows on the outer edges scroll through 1-38.
+- Same component reused on closed-roof rating panel.
 
-## 4. Chip system rework
+## 3. "Formation" → "Mode" pager (1v1 / 2v2 / 3v3)
 
-- Each of the 5 chips now has **8 charges** for the season (badge shows `x/8`).
-- Per-GW limit: max **2 chips** played, and have option that each chip has an extra so that duting the 38 game weeks there are 5 gw one will have an option of using 3 chips ( edit the chips to a better point awarding system,one can be like have option of unlocking the whole season teams playing that gw,so that client has more options of having many correct predictions,since the app only has the top 5 teams picks for prediction every gw,eg la liga -barca,real,athletico,athletic, but during that gw,chip it unlocks all la liga gw games to predict.
-- Add `chipsUsedThisGw` counter; chip rail disables remaining chips once limit hit. Tooltip explains.
-- Chip charges decrement on play; `gw === 38` unlocks the 3rd slot visually.
+Repurpose the formation control as a season **League Slot Mode**:
 
-## 5. Ballon d'Or mid-season unlock
+- `1v1` = 1 league for the whole season (max focus, biggest per-correct multiplier).
+- `2v2` = 2 leagues.
+- `3v3` = 3 leagues (most coverage, smallest multiplier).
+- Same 3-circle pager UI as GW scroller.
+- Choosing a mode caps how many leagues the user can toggle "active" in the league menu for the season; once locked at GW1 it stays.
 
-- Lock the BdO card until `gw >= 19`. Before that, show "Unlocks at GW 19".
-- From GW 19+, BdO card opens a dedicated picker: pick **Top 3** (gold/silver/bronze, 50/30/15 pts) + pick up to **7 more** for the rest of top 10 (5 pts each correct).
-- This same card continues to show the user's other season individual picks (top scorer, top assist, golden boy) as collapsible rows underneath.
+## 4. Replacement for old "Formation" chip slot — **"Tactic" pager**
 
-## 6. Billboard ads behind goalposts
+A new small pager next to Mode with picks: `Attack`, `Balanced`, `Park-the-bus`.
 
-- Goalpost stand backgrounds become billboard ad slots.
-- Cycle through 3 promo cards ( embed YouTube videos directly inside the billboards reliably). 
-- Implementation: small `<BillboardAd />` component cycling via `setInterval` in a `useEffect`, rendered inside the top + bottom stands (the actual goal-end stands, not the side stands).
-- Note on YouTube: use the videoos of the links i shared on youtube,embed them on the ad containers
+- Attack = +25% points on correct scorer picks, -25% on clean-sheet picks.
+- Balanced = flat.
+- Park-the-bus = +50% on correct 0-0 / clean sheet, -25% on scorer picks.
+- Switchable per GW, no chip cost.
 
-## 7. Pitch surface per sport
+## 5. Card / discipline system
 
-- `.pitch[data-surface="football"]` keeps current grass.
-- `basketball` → polished wood gradient + center circle + key boxes, hide goalposts.
-- `tennis` → clay/court lines, net across middle.
-- `f1` → asphalt with start/finish grid.
-- Goalpost components rendered conditionally on `sport === 'football'`.
+Replace today's discipline card with a real referee mechanic:
 
-## 8. Remove opposite-side seat highlights
+- **Yellow card** (3 per season): unlock one previously-locked locked prediction (e.g. swap a season pick mid-season, or unlock a non-top-4 fixture without burning a chip).
+- **Red card** (1 per season): wipe a single bad GW's negative points (floor that GW at 0).
+- **Penalty (5 cards)**: auto-penalty deducted (-10 pts) every time the user fails to submit predictions for at least 1 of the 4 top-4 fixtures before kickoff. Tracked via `penaltiesTaken` counter.
 
-- Remove highlight stripe / glow on left+right `.stand` elements (currently `.stand .seats` shimmer). Keep plain dim seats only on those two sides; top/bottom already have no seats per earlier change.
+UI: small ref-card stack in the top bar showing remaining yellows / red / penalty count.
+
+## 6. Chip rules refinement
+
+- 5 chips × 8 charges (existing).
+- **Per GW: user picks exactly 2 chips to "arm"** before kickoff via a small "Arm Chips" modal (checkbox list with 2-max). Only armed chips fire that GW.
+- GW 34-38: arm slot expands to 3.
+- "Full GW Unlock" chip is what enables predicting non-top-4 fixtures.
+
+## 7. Roof-open right container = "My Season Stand"
+
+- Client account header (avatar, username, total pts, rank).
+- Season individual picks (Top scorer, Top assist, Golden Boy, Ballon d'Or top-3 + 7 extras, MVP for non-football).
+- All collapsible rows. Click any → zoom modal to edit (existing `ed-zoom`).
+
+## 8. New stands BEHIND billboards
+
+Currently top + bottom stands are billboard ads. Add a **second tier** behind each:
+
+- **Top stand back row** = live **league standings table** for the league chosen in the top menu (top 6 rows visible, scroll for more).
+- **Bottom stand back row** (between pitch and menubar) = **individual stat leaders** for that league: top scorer, top assist, top clean sheets, top rating. 4 small cards.
+- Standings/stats come from `SPORT_DATA[sport].leagues[currentLeague]`.
+- Billboards stay in front; new stands sit behind via z-index, with a slight perspective tilt.
+
+## 9. Billboard ads — edge-to-edge LED look
+
+- Make `.goal-ad` span full width of the goal-end stand (edge to edge), thinner height, with LED-pixel CSS texture (repeating-radial-gradient dots) and a subtle scrolling shimmer.
+- Swap embedded videos to better full-bleed sports promo loops (muted, autoplay, loop). Keep YouTube `embed` URLs but use `playlist=ID&loop=1&controls=0&modestbranding=1` and updated IDs:
+  - Lay's UCL 2024 anthem ad: `nQK_zrk7Mxg`
+  - Pepsi football "Fizz to Life": `eXz9Bi4UjpI`
+  - Heineken UCL "Cheers": `Iq3sg4i2bNA`
+- If iframe sizing flickers, fall back to CSS LED panel with brand wordmark + animated gradient (already styled).
+
+## 10. Roof-closed LEFT = Account + Fav Team Ratings
+
+- Top: account card (avatar, handle, total pts, current rank, social icons row).
+- Below: fav team header with crest, then **3-circle GW pager**.
+- For active GW: show that GW's opponent + the 11 players that started; each row has 0-10 stepper.
+- Ratings persist in `playerRatings[playerId][gw]`. Tap player name → modal with full-season curve (reuses existing `playerModal`).
+
+## 11. Roof-closed RIGHT
+
+Stays as season-long aggregate: average ratings leaderboard for own fav team (sorted by season avg), plus "Pick of the Week" auto-derived from highest-rated player that GW.
+
+&nbsp;
+
+better animation of roof opening/closing,have the edges have a rolling effect to make it seem its rolling in
 
 ## Files
 
-- `src/routes/index.tsx` — state, data map, components, modal, conditional rendering.
-- `src/styles.css` — whistle scroller, billboard ad card, sport surfaces, zoom modal variant, chip charge badges.
+- `src/routes/index.tsx` — state additions (`armedChips`, `cards`, `tactic`, `leagueMode`, expanded `SPORT_DATA`), new Pager component, restructured roof halves, new BackStand + StatsStand components, updated `GoalAd`, new ArmChips modal, top-4 filter for predictions.
+- `src/styles.css` — `.pager-3`, `.back-stand`, `.stats-stand`, `.led-billboard`, `.ref-card`, sport surface tweaks for F1 grid prediction overlay.

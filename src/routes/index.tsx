@@ -29,11 +29,17 @@ const LEAGUES = [
   { id: "bundesliga", name: "Bundesliga", icon: "🇩🇪" },
   { id: "ligue1", name: "Ligue 1", icon: "🇫🇷" },
 ];
-const FORMATIONS = [
-  { id: "1v1", name: "1V1", desc: "Pick 1 league + 1 cup. Focused predictions, biggest XP multiplier (×1.0)." },
-  { id: "2v2", name: "2V2", desc: "Two leagues + UCL. Balanced load (×1.4 XP)." },
-  { id: "3v3", name: "3V3", desc: "Three leagues + UCL + UEL. Heavy schedule (×1.8 XP)." },
-  { id: "all", name: "ALL-IN", desc: "Every major league. Max chaos, max points (×2.5 XP)." },
+/* League slot mode — locks how many leagues you predict the WHOLE season */
+const MODES = [
+  { id: "1v1", name: "1v1", desc: "Lock 1 league all season. Max focus, ×1.0 XP, biggest per-correct multiplier." },
+  { id: "2v2", name: "2v2", desc: "Lock 2 leagues. Balanced spread, ×1.4 XP." },
+  { id: "3v3", name: "3v3", desc: "Lock 3 leagues. Wide net, ×1.8 XP, smaller multiplier." },
+];
+/* Per-GW Tactic — adjusts scoring for that GW */
+const TACTICS = [
+  { id: "attack", name: "Attack", cls: "ack", desc: "+25% scorer pts · −25% clean-sheet pts" },
+  { id: "balanced", name: "Balanced", cls: "bal", desc: "Flat scoring across the GW" },
+  { id: "park", name: "Park-the-bus", cls: "", desc: "+50% on 0-0 / clean sheet · −25% on scorers" },
 ];
 
 /* Chips: 8 charges each. 2 plays per GW; 3 plays during the final 5 GWs (34-38). */
@@ -61,6 +67,13 @@ const SPORT_DATA: Record<string, any> = {
       { id: "m3", h: "Bayern", a: "Dortmund", hs: 0, as: 0, min: "34'", live: true, league: "Bundesliga" },
       { id: "m4", h: "PSG", a: "Marseille", hs: 0, as: 0, min: "20:00", live: false, league: "Ligue 1" },
       { id: "m5", h: "Inter", a: "Juventus", hs: 0, as: 0, min: "21:45", live: false, league: "Serie A" },
+    ],
+    /* Visible-but-locked unless Full GW Unlock chip is armed */
+    lockedMatches: [
+      { id: "lm1", h: "Brighton", a: "Brentford", hs: 0, as: 0, min: "17:30", live: false, league: "EPL" },
+      { id: "lm2", h: "Getafe", a: "Cadiz", hs: 0, as: 0, min: "19:00", live: false, league: "La Liga" },
+      { id: "lm3", h: "Lecce", a: "Empoli", hs: 0, as: 0, min: "18:30", live: false, league: "Serie A" },
+      { id: "lm4", h: "Wolfsburg", a: "Mainz", hs: 0, as: 0, min: "15:30", live: false, league: "Bundesliga" },
     ],
     favTeam: "FC Barcelona",
     roster: [
@@ -204,10 +217,15 @@ const SPORT_DATA: Record<string, any> = {
     surface: "f1",
     pitchLabel: "CIRCUIT",
     matches: [
-      { id: "f1", h: "Bahrain GP", a: "Race", hs: 0, as: 0, min: "Sun 15:00", live: false, league: "F1 R1" },
-      { id: "f2", h: "Saudi GP", a: "Race", hs: 0, as: 0, min: "Sat 18:00", live: false, league: "F1 R2" },
-      { id: "f3", h: "Australian GP", a: "Qualy", hs: 0, as: 0, min: "Sat 06:00", live: false, league: "F1 R3" },
+      { id: "f1p", h: "Practice", a: "Fastest Lap", hs: 0, as: 0, min: "Fri 14:30", live: false, league: "Bahrain GP · FP" },
+      { id: "f1q", h: "Qualifying", a: "Pole Position", hs: 0, as: 0, min: "Sat 18:00", live: false, league: "Bahrain GP · Q" },
+      { id: "f1r", h: "Race Day", a: "Grid 1-10", hs: 0, as: 0, min: "Sun 15:00", live: false, league: "Bahrain GP · R" },
     ],
+    lockedMatches: [
+      { id: "f2p", h: "Practice", a: "Fastest Lap", hs: 0, as: 0, min: "Fri 14:30", live: false, league: "Saudi GP · FP" },
+      { id: "f2q", h: "Qualifying", a: "Pole Position", hs: 0, as: 0, min: "Sat 18:00", live: false, league: "Saudi GP · Q" },
+    ],
+    circuits: ["Bahrain", "Jeddah", "Melbourne", "Suzuka", "Shanghai", "Miami", "Imola", "Monaco", "Montréal", "Barcelona", "Spielberg", "Silverstone", "Budapest", "Spa", "Zandvoort", "Monza", "Baku", "Singapore", "Austin", "México City", "Interlagos", "Las Vegas", "Lusail", "Abu Dhabi"],
     favTeam: "Ferrari",
     roster: [
       { id: "fp1", n: 16, name: "C. Leclerc", pos: "DRV" },
@@ -277,7 +295,7 @@ function GoalAd({ position }: { position: "top" | "bottom" }) {
   const ad = GOAL_ADS[idx];
   const src = `https://www.youtube.com/embed/${ad.vid}?autoplay=1&mute=1&loop=1&playlist=${ad.vid}&controls=0&modestbranding=1&playsinline=1&start=${ad.start}&rel=0`;
   return (
-    <div className={"goal-ad " + position} key={ad.id} style={{ borderColor: ad.color }}>
+    <div className={"goal-ad led " + position} key={ad.id} style={{ borderColor: ad.color }}>
       <iframe
         title={ad.brand}
         src={src}
@@ -398,11 +416,17 @@ function Index() {
   const data = useMemo(() => SPORT_DATA[sport.id] || SPORT_DATA.football, [sport]);
 
   const [gw, setGw] = useState(14);
-  const [formIdx, setFormIdx] = useState(0);
-  const formation = FORMATIONS[formIdx];
+  const [modeIdx, setModeIdx] = useState(1); // 1v1 / 2v2 / 3v3
+  const mode = MODES[modeIdx];
+  const [tacticByGw, setTacticByGw] = useState<Record<number, string>>({});
+  const tacticId = tacticByGw[gw] || "balanced";
+  const tactic = TACTICS.find((t) => t.id === tacticId)!;
+  const setTactic = (id: string) => setTacticByGw((m) => ({ ...m, [gw]: id }));
 
-  const [yellows, setYellows] = useState(2);
-  const [reds] = useState(0);
+  /* Discipline cards: 3 yellows / 1 red / penalty counter */
+  const [yellows, setYellows] = useState(3);
+  const [reds, setReds] = useState(1);
+  const [penalties, setPenalties] = useState(0);
 
   /* Chip charges + per-GW usage */
   const [chipCharges, setChipCharges] = useState<Record<string, number>>(() =>
@@ -427,12 +451,15 @@ function Index() {
   useEffect(() => {
     setPreds((prev) => {
       const next = { ...prev };
-      data.matches.forEach((m: any) => {
+      [...(data.matches || []), ...(data.lockedMatches || [])].forEach((m: any) => {
         if (!next[m.id]) next[m.id] = { h: 1, a: 1, locked: false };
       });
       return next;
     });
   }, [data]);
+
+  // Full-GW unlock chip armed for current GW?
+  const flUnlocked = (chipsByGw[gw] || []).includes("fl");
 
   // season picks per sport
   const [seasonPicks, setSeasonPicks] = useState<Record<string, any>>({});
@@ -478,15 +505,25 @@ function Index() {
 
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2400); };
 
-  const useChip = (id: string) => {
+  /* Arm/disarm a chip for the current GW. Per-GW limit: 2 (3 in GW 34-38). */
+  const armChip = (id: string) => {
     const chip = CHIPS.find((c) => c.id === id)!;
+    const armed = chipsByGw[gw] || [];
+    const isArmed = armed.includes(id);
+    if (isArmed) {
+      // disarm — refund the charge
+      setChipsByGw((m) => ({ ...m, [gw]: armed.filter((x) => x !== id) }));
+      setChipCharges((c) => ({ ...c, [id]: (c[id] || 0) + 1 }));
+      showToast(`${chip.icon} ${chip.name} disarmed`);
+      return;
+    }
     if ((chipCharges[id] || 0) <= 0) return showToast(`${chip.name}: out of charges`);
-    if (usedThisGw >= maxThisGw) return showToast(`Max ${maxThisGw} chips this GW`);
+    if (armed.length >= maxThisGw) return showToast(`Max ${maxThisGw} chips armed this GW`);
     setChipCharges((c) => ({ ...c, [id]: c[id] - 1 }));
-    setChipsByGw((m) => ({ ...m, [gw]: [...(m[gw] || []), id] }));
+    setChipsByGw((m) => ({ ...m, [gw]: [...armed, id] }));
     setChipFlash(id);
     setActiveChip(chip);
-    showToast(`${chip.icon} ${chip.name} · +${chip.pts} pts`);
+    showToast(`${chip.icon} ${chip.name} armed for GW ${gw}`);
     setPoints((p) => p + chip.pts);
     setPtsFloat({ id: Date.now(), v: chip.pts });
     setTimeout(() => setPtsFloat(null), 1100);
@@ -578,47 +615,49 @@ function Index() {
         {/* LEFT PANEL */}
         <aside className="side-panel left">
           <div className="panel-scroll">
-            <div className="sec zoomable" onClick={() => openZoom("center")}>⚙ Predict Center · {sport.name}</div>
+            <div className="sec zoomable" onClick={() => openZoom("center")}>⚙ Prediction Stand · {sport.name}</div>
             <div style={{ fontFamily: "var(--cd)", fontSize: ".4rem", color: "var(--sub)", marginBottom: 5, lineHeight: 1.4 }}>
-              Set GW, formation, and {sport.id === "f1" ? "grid finish" : "score"} picks. Tap any card to simulate it on the {data.pitchLabel.toLowerCase()}.
-            </div>
-            <div className="mini-row">
-              <button className="mini-chip" onClick={() => setEditor({ type: "gw" })}>
-                <span className="mini-lbl">GW</span>
-                <span className="mini-val">{gw}</span>
-                <span className="mini-sub">+{32 + (gw % 5) * 6} pts</span>
-              </button>
-              <button className="mini-chip" onClick={() => setEditor({ type: "form" })}>
-                <span className="mini-lbl">FORM</span>
-                <span className="mini-val">{formation.name}</span>
-                <span className="mini-sub">tap to change</span>
-              </button>
+              {league.name} · GW {gw} · top-4 fixtures predictable. Use Full-GW Unlock chip to add the rest.
             </div>
 
-            <div className="sec" style={{ marginTop: 8 }}>🟨 Discipline · {usedThisGw}/{maxThisGw} chips this GW</div>
-            <div className="card-tracker">
-              <span className="card-lbl">YELLOW</span>
-              <div className="ycards-row">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <span key={i} className={"ycard-pip " + (i < yellows ? "earned" : "")} />
-                ))}
-              </div>
-              <span style={{ fontFamily: "var(--hd)", fontSize: ".7rem", color: "var(--gold)" }}>{yellows}</span>
+            {/* GW pager */}
+            <div className="pager3-label">Game Week</div>
+            <Pager3 value={gw} setValue={setGw} min={1} max={38} formatTag="GW" />
+
+            {/* Mode + Tactic pagers */}
+            <div className="pager3-label" style={{ marginTop: 8 }}>Mode</div>
+            <Pager3
+              value={modeIdx}
+              setValue={setModeIdx}
+              min={0}
+              max={MODES.length - 1}
+              labelFor={(i) => MODES[i].name}
+              formatTag="LEAGUES"
+              onCenterClick={() => setEditor({ type: "mode" })}
+            />
+            <div style={{ fontFamily: "var(--cd)", fontSize: ".4rem", color: "var(--sub)", padding: "3px 6px 0", lineHeight: 1.4 }}>{mode.desc}</div>
+
+            <div className="pager3-label" style={{ marginTop: 8 }}>Tactic · GW {gw}</div>
+            <div className="tag-row">
+              {TACTICS.map((t) => (
+                <button key={t.id} className={"tag-chip " + (tacticId === t.id ? "on " + t.cls : "")} onClick={() => { setTactic(t.id); showToast(`Tactic: ${t.name}`); }}>{t.name}</button>
+              ))}
             </div>
-            <div className="card-tracker">
-              <span className="card-lbl">RED</span>
-              <div className="ycards-row">
-                {reds === 0 && <span style={{ fontFamily: "var(--cd)", fontSize: ".42rem", color: "var(--sub)" }}>None — clean run</span>}
-              </div>
-              <span style={{ fontFamily: "var(--hd)", fontSize: ".7rem", color: "var(--red)" }}>{reds}</span>
+            <div style={{ fontFamily: "var(--cd)", fontSize: ".38rem", color: "var(--sub)", padding: "0 4px", lineHeight: 1.4 }}>{tactic.desc}</div>
+
+            <div className="sec" style={{ marginTop: 8 }}>🟨 Discipline</div>
+            <div className="ref-stack">
+              <div className="ref-card y" title="Yellow: unlock 1 locked prediction"><span className="refc-icon y" /><span className="refc-v">{yellows}</span><span className="refc-l">Yellow</span></div>
+              <div className="ref-card r" title="Red: wipe a bad GW (floor at 0)"><span className="refc-icon r" /><span className="refc-v">{reds}</span><span className="refc-l">Red</span></div>
+              <div className="ref-card p" title="Penalty: missed a top-4 prediction (-10 pts each)"><span className="refc-icon p" /><span className="refc-v">{penalties}</span><span className="refc-l">Pen</span></div>
             </div>
-            <div style={{ fontFamily: "var(--cd)", fontSize: ".4rem", color: "var(--sub)", padding: "3px 6px" }}>
-              Chips: 8 charges each · 2 plays/GW · 3 plays GW 34-38
+            <div style={{ fontFamily: "var(--cd)", fontSize: ".38rem", color: "var(--sub)", padding: "0 6px 4px", lineHeight: 1.4 }}>
+              {usedThisGw}/{maxThisGw} chips armed · {flUnlocked ? "🌐 GW unlocked" : "Top-4 only"}
             </div>
 
             <div className="divr" />
 
-            <div className="sec zoomable" onClick={() => openZoom("matches")}>{sport.id === "f1" ? "🏁 Race Predictions" : "⚽ Match Predictions"} · GW {gw}</div>
+            <div className="sec zoomable" onClick={() => openZoom("matches")}>{sport.id === "f1" ? "🏁 Race Predictions" : "⚽ Top-4 Predictions"} · GW {gw}</div>
             {data.matches.map((m: any) => {
               const p = preds[m.id] || { h: 0, a: 0, locked: false };
               return (
@@ -650,11 +689,47 @@ function Index() {
                 </div>
               );
             })}
+
+            {/* Locked rest of GW (visible-but-not-selectable unless FL chip armed) */}
+            {(data.lockedMatches || []).length > 0 && (
+              <>
+                <div className="sec" style={{ marginTop: 6, color: flUnlocked ? "var(--lime)" : "var(--sub)" }}>
+                  {flUnlocked ? "🌐 Unlocked Rest of GW" : "🔒 Rest of GW (Full-Unlock Chip)"}
+                </div>
+                {data.lockedMatches.map((m: any) => {
+                  const p = preds[m.id] || { h: 0, a: 0, locked: false };
+                  return (
+                    <div key={m.id} className={"pred-card " + (flUnlocked ? "" : "locked-fix")} onClick={() => flUnlocked && (setSelectedMatch(m), setEditor({ type: "pred", id: m.id }))}>
+                      <div className="pc-head">
+                        <span className="pc-time">{m.min}</span>
+                        <span className="pred-locked-tag">{flUnlocked ? "OPEN" : "LOCKED"}</span>
+                      </div>
+                      <div className="pc-teams">
+                        <span className="pc-tn">{m.h}</span>
+                        <span className="pc-tn a">{m.a}</span>
+                      </div>
+                      {flUnlocked && (
+                        <div className="pred-row">
+                          <span className="pred-lbl">PICK</span>
+                          <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
+                            <input className="sinp" value={p.h} onChange={(e) => updatePred(m.id, "h", e.target.value)} onClick={(e) => e.stopPropagation()} />
+                            <span style={{ fontFamily: "var(--hd)", color: "var(--sub)" }}>-</span>
+                            <input className="sinp" value={p.a} onChange={(e) => updatePred(m.id, "a", e.target.value)} onClick={(e) => e.stopPropagation()} />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </>
+            )}
           </div>
         </aside>
 
         {/* PITCH WRAP */}
         <main className="pitch-wrap">
+          {/* Top back-stand (league standings) */}
+          <BackStand data={data} league={league} position="top" />
           {/* TOP goal-end ad behind goalpost */}
           {data.surface === "football" && <GoalAd position="top" />}
 
@@ -665,26 +740,28 @@ function Index() {
             </div>
 
             <div className="chip-rail left">
-              <div className="chip-rail-title">CHIPS</div>
+              <div className="chip-rail-title">ARM·{usedThisGw}/{maxThisGw}</div>
               {CHIPS.map((c) => {
                 const charges = chipCharges[c.id] || 0;
-                const out = charges <= 0;
-                const blocked = usedThisGw >= maxThisGw && !out;
+                const armed = (chipsByGw[gw] || []).includes(c.id);
+                const out = charges <= 0 && !armed;
+                const blocked = usedThisGw >= maxThisGw && !armed && !out;
                 return (
                   <button
                     key={c.id}
-                    className={"chip-btn " + (out ? "used " : "") + (chipFlash === c.id ? "flash " : "") + (blocked ? "blocked" : "")}
+                    className={"chip-btn " + (out ? "used " : "") + (chipFlash === c.id ? "flash " : "") + (blocked ? "blocked " : "") + (armed ? "armed" : "")}
                     style={{
                       borderColor: out ? "rgba(255,255,255,.08)" : `${c.color}55`,
                       background: out ? "linear-gradient(160deg,rgba(0,0,0,.55),rgba(10,20,30,.7))" : `linear-gradient(160deg,${c.color}1f,rgba(0,0,0,.6))`,
                     }}
-                    onClick={() => useChip(c.id)}
+                    onClick={() => armChip(c.id)}
                     onMouseEnter={(e) => {
                       const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
                       setChipTip({ chip: c, x: r.right + 8, y: r.top });
                     }}
                     onMouseLeave={() => setChipTip(null)}
                   >
+                    {armed && <span className="chip-armed-tag">ON</span>}
                     <span className="chip-icon">{c.icon}</span>
                     <span className="chip-code" style={{ color: c.color }}>{c.code}</span>
                     <span className="chip-pts">+{c.pts}</span>
@@ -739,6 +816,8 @@ function Index() {
           </div>
 
           {data.surface === "football" && <GoalAd position="bottom" />}
+          {/* Bottom back-stand (stat leaders) */}
+          <BackStand data={data} league={league} position="bottom" />
         </main>
 
         {/* RIGHT PANEL */}
@@ -964,16 +1043,33 @@ function Index() {
               </>
             )}
 
-            {editor.type === "form" && (
+            {(editor.type === "form" || editor.type === "mode") && (
               <>
-                <div className="ed-title">⚔ Formation Mode</div>
-                <div className="ed-sub">Pick how aggressive your prediction load is this season.</div>
-                {FORMATIONS.map((f, i) => (
-                  <button key={f.id} className={"ed-list-item " + (formIdx === i ? "sel" : "")} onClick={() => { setFormIdx(i); showToast(`Formation: ${f.name}`); }}>
+                <div className="ed-title">⚔ Season League Mode</div>
+                <div className="ed-sub">How many leagues you commit to predicting all 38 GWs. Locked at GW 1 — choose carefully.</div>
+                {MODES.map((f, i) => (
+                  <button key={f.id} className={"ed-list-item " + (modeIdx === i ? "sel" : "")} onClick={() => { setModeIdx(i); showToast(`Mode: ${f.name}`); }}>
                     <span className="eli-name">{f.name}</span>
                     <span className="eli-desc">{f.desc}</span>
                   </button>
                 ))}
+              </>
+            )}
+
+            {editor.type === "armChips" && (
+              <>
+                <div className="ed-title">🎯 Arm Chips · GW {gw}</div>
+                <div className="ed-sub">Pick the {maxThisGw} chips that fire this GW. Click an armed chip again to disarm and refund.</div>
+                {CHIPS.map((c) => {
+                  const armed = (chipsByGw[gw] || []).includes(c.id);
+                  const charges = chipCharges[c.id] || 0;
+                  return (
+                    <button key={c.id} className={"ed-list-item " + (armed ? "sel" : "")} onClick={() => armChip(c.id)} disabled={charges <= 0 && !armed}>
+                      <span className="eli-name">{c.icon} {c.name} {armed ? "· ARMED" : ""}</span>
+                      <span className="eli-desc">{c.desc} · {charges}/8 charges left</span>
+                    </button>
+                  );
+                })}
               </>
             )}
 
@@ -1185,13 +1281,13 @@ function Index() {
             {editor.type === "center" && (
               <>
                 <div className="ed-title">⚙ Predict Center · {sport.name}</div>
-                <div className="ed-sub">Quick view of GW, formation and discipline.</div>
+                <div className="ed-sub">Quick view of GW, mode and discipline.</div>
                 <div className="mini-row" style={{ marginBottom: 10 }}>
                   <div className="mini-chip"><span className="mini-lbl">GW</span><span className="mini-val">{gw}</span></div>
-                  <div className="mini-chip"><span className="mini-lbl">FORM</span><span className="mini-val">{formation.name}</span></div>
+                  <div className="mini-chip"><span className="mini-lbl">MODE</span><span className="mini-val">{mode.name}</span></div>
                   <div className="mini-chip"><span className="mini-lbl">CHIPS</span><span className="mini-val">{usedThisGw}/{maxThisGw}</span></div>
                 </div>
-                <div className="ed-sub">{formation.desc}</div>
+                <div className="ed-sub">{mode.desc}</div>
               </>
             )}
           </div>
@@ -1213,19 +1309,7 @@ function RatingPanel({
         <div className="ratp-title">⭐ Rate Your Squad · GW {gw}</div>
         <div className="ratp-sub">Scroll the whistle rail to switch GW. Tap a player to see their season curve.</div>
       </div>
-      <div className="whistle-rail">
-        <button className="whistle-btn" onClick={() => setGw(Math.max(1, gw - 1))} aria-label="Prev GW">‹</button>
-        <div className="whistle-scroll">
-          {Array.from({ length: 38 }).map((_, i) => (
-            <button key={i} className={"whistle " + (gw === i + 1 ? "act" : "")} onClick={() => setGw(i + 1)}>
-              <span className="whistle-hole" />
-              <span className="whistle-gw">GW</span>
-              <span className="whistle-num">{i + 1}</span>
-            </button>
-          ))}
-        </div>
-        <button className="whistle-btn" onClick={() => setGw(Math.min(38, gw + 1))} aria-label="Next GW">›</button>
-      </div>
+      <Pager3 value={gw} setValue={setGw} min={1} max={38} formatTag="GW" />
       <div className="rating-list">
         {roster.map((p: any) => {
           const r = getRating(p.id, gw);
@@ -1243,6 +1327,82 @@ function RatingPanel({
                 <button onClick={() => setRating(p.id, gw, Math.min(10, r + 1))}>+</button>
               </div>
             </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- 3-circle pager (GW / Mode / etc.) ---------- */
+function Pager3({
+  value, setValue, min, max, formatTag, labelFor, onCenterClick,
+}: {
+  value: number; setValue: (n: number) => void; min: number; max: number;
+  formatTag?: string; labelFor?: (i: number) => string; onCenterClick?: () => void;
+}) {
+  const left = value - 1;
+  const right = value + 1;
+  const fmt = (i: number) => labelFor ? labelFor(i) : String(i);
+  return (
+    <div className="pager3">
+      <button className="pager3-arrow" onClick={() => setValue(Math.max(min, value - 1))} disabled={value <= min} aria-label="Prev">‹</button>
+      <div className="pager3-track">
+        {left >= min ? (
+          <button className="pager3-circ side" onClick={() => setValue(left)}>
+            {formatTag && <span className="p3-tag">{formatTag}</span>}
+            <span>{fmt(left)}</span>
+          </button>
+        ) : <span className="pager3-circ side" style={{ visibility: "hidden" }} />}
+        <button className="pager3-circ center" onClick={onCenterClick}>
+          {formatTag && <span className="p3-tag">{formatTag}</span>}
+          <span>{fmt(value)}</span>
+        </button>
+        {right <= max ? (
+          <button className="pager3-circ side" onClick={() => setValue(right)}>
+            {formatTag && <span className="p3-tag">{formatTag}</span>}
+            <span>{fmt(right)}</span>
+          </button>
+        ) : <span className="pager3-circ side" style={{ visibility: "hidden" }} />}
+      </div>
+      <button className="pager3-arrow" onClick={() => setValue(Math.min(max, value + 1))} disabled={value >= max} aria-label="Next">›</button>
+    </div>
+  );
+}
+
+/* ---------- Back stand: standings + stat leaders ---------- */
+export function BackStand({ data, league, position }: { data: any; league: any; position: "top" | "bottom" }) {
+  if (position === "top") {
+    return (
+      <div className="back-stand">
+        <span className="bs-title">{league?.name || "League"} TABLE</span>
+        <div className="bs-scroll">
+          {data.standings.map((s: any, i: number) => (
+            <span key={s.team} className={"bs-row " + (s.me ? "me" : "")}>
+              <span className="bs-pos">{i + 1}</span>
+              <span className="bs-team">{s.team}</span>
+              <span className="bs-pts">{s.pts}</span>
+            </span>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  // bottom: stat leaders
+  const labels = data.seasonPicksLabels;
+  return (
+    <div className="back-stand bottom">
+      <span className="bs-title">STAT LEADERS</span>
+      <div className="bs-scroll">
+        {(["a", "b", "c", "d"] as const).map((k) => {
+          const top = data.leaders[k]?.[0];
+          if (!top) return null;
+          return (
+            <span key={k} className="bs-stat">
+              <span className="bs-stat-lbl">{labels[k]}</span>
+              <span className="bs-stat-name">{top.name}</span>
+              <span className="bs-stat-val">{top.val}</span>
+            </span>
           );
         })}
       </div>
